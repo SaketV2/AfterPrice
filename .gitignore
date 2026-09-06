@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.next-stale-v15/
+out/
+build/
+*.tsbuildinfo
+.codex/
+AGENTS.md
+.env*
+!.env.example

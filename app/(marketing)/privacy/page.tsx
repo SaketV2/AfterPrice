@@ -1,0 +1,5 @@
+import { Eyebrow } from '@/components/marketing/marketing-ui'
+
+export const metadata = { title: 'Privacy' }
+
+export default function PrivacyPage() { return <main className="px-5 pb-28 pt-14 sm:px-8 sm:pb-40 sm:pt-24 lg:px-10"><div className="mx-auto max-w-3xl"><Eyebrow>Legal placeholder</Eyebrow><h1 className="font-[family-name:var(--font-display)] text-5xl font-750 leading-[.96] tracking-[-.07em] sm:text-7xl">Privacy, plainly stated.</h1><p className="mt-8 text-lg leading-8 text-[#5d6673]">This V1 is a local product demo. It does not connect to banks, retailers or production authentication. Sample data stays in the browser flow and is not presented as a production privacy promise.</p><div className="mt-14 space-y-8 text-sm leading-7 text-[#5d6673]"><p>When SpendGuard becomes a production service, the privacy policy will explain exactly what information is collected, why it is needed and how it can be removed.</p><p>For now, do not enter sensitive financial information into the demo.</p></div></div></main> }

@@ -1,0 +1,28 @@
+'use client'
+
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import { useSpendGuardStore } from '@/lib/store/use-spendguard-store'
+import { currency, daysUntil, filterItems, formatBillingCycle, shortDate } from '@/lib/services'
+import { EmptyState, Panel, StatusBadge } from '@/components/dashboard/product-ui'
+import type { SubscriptionStatus } from '@/lib/types'
+
+const statusLabel: Record<SubscriptionStatus, string> = { stable: 'Stable', price_increase: 'Price increased', plan_changed: 'Plan changed', renewing_soon: 'Renewing soon', cancelled: 'Cancelled' }
+const statusTone: Record<SubscriptionStatus, 'neutral' | 'accent' | 'warning' | 'danger' | 'success'> = { stable: 'success', price_increase: 'warning', plan_changed: 'accent', renewing_soon: 'warning', cancelled: 'danger' }
+
+export function SubscriptionList() {
+  const { data } = useSpendGuardStore()
+  const [query, setQuery] = useState('')
+  const [status, setStatus] = useState<'all' | SubscriptionStatus>('all')
+  const [sort, setSort] = useState<'renewal' | 'impact' | 'name'>('renewal')
+  const subscriptions = useMemo(() => {
+    let rows = filterItems(data.items.filter((item) => item.type === 'subscription'), query)
+    if (status !== 'all') rows = rows.filter((item) => item.subscription?.status === status)
+    return [...rows].sort((a, b) => sort === 'name' ? a.title.localeCompare(b.title) : sort === 'impact' ? (b.subscription?.annualImpact ?? 0) - (a.subscription?.annualImpact ?? 0) : new Date(a.subscription!.nextRenewal).getTime() - new Date(b.subscription!.nextRenewal).getTime())
+  }, [data.items, query, sort, status])
+  return <>
+    <div className="mb-5 flex flex-col gap-3 sm:flex-row"><label className="relative flex-1"><span className="sr-only">Search subscriptions</span><span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--foreground-muted)]">⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search subscriptions or providers" className="h-12 w-full rounded-xl border border-[var(--border)] bg-white pl-10 pr-4 text-sm outline-none transition placeholder:text-[var(--foreground-muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]" /></label><select value={status} onChange={(event) => setStatus(event.target.value as typeof status)} aria-label="Filter subscription status" className="h-12 rounded-xl border border-[var(--border)] bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--accent)]"><option value="all">All statuses</option><option value="price_increase">Price increased</option><option value="plan_changed">Plan changed</option><option value="renewing_soon">Renewing soon</option><option value="stable">Stable</option></select><select value={sort} onChange={(event) => setSort(event.target.value as typeof sort)} aria-label="Sort subscriptions" className="h-12 rounded-xl border border-[var(--border)] bg-white px-3 text-sm font-semibold outline-none focus:border-[var(--accent)]"><option value="renewal">Next renewal</option><option value="impact">Annual impact</option><option value="name">Name A–Z</option></select></div>
+    <Panel className="overflow-hidden p-0">{subscriptions.length === 0 ? <div className="p-5"><EmptyState title="No matching subscriptions" description="Try another search or add a subscription to start tracking plan changes." action={<Link href="/app/add" className="inline-flex min-h-11 items-center rounded-xl bg-[var(--accent)] px-4 text-sm font-bold text-white">Add subscription</Link>} /></div> : <><div className="hidden grid-cols-[minmax(180px,1.5fr)_minmax(120px,1fr)_120px_120px_120px_130px] gap-4 border-b border-[var(--border)] bg-[var(--surface-subtle)] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--foreground-muted)] lg:grid"><span>Service</span><span>Provider / plan</span><span>Current</span><span>Original</span><span>Renewal</span><span>Status</span></div><div className="divide-y divide-[var(--border)]">{subscriptions.map((item) => { const subscription = item.subscription!; const days = daysUntil(subscription.nextRenewal); return <Link key={item.id} href={`/app/items/${item.id}`} className="grid gap-3 px-5 py-4 transition hover:bg-[var(--surface-subtle)] lg:grid-cols-[minmax(180px,1.5fr)_minmax(120px,1fr)_120px_120px_120px_130px] lg:items-center lg:gap-4"><div className="min-w-0"><p className="truncate text-sm font-bold">{subscription.service}</p><p className="mt-1 text-xs text-[var(--foreground-muted)]">{subscription.category}</p></div><div className="text-sm text-[var(--foreground-secondary)]"><span className="lg:hidden">Plan · </span>{subscription.provider} · {subscription.plan}<span className="block text-xs text-[var(--foreground-muted)]">{formatBillingCycle(subscription.billingCycle)}ly billing</span></div><div className="text-sm font-bold"><span className="lg:hidden">Current · </span>{currency(subscription.currentPrice)}<span className="ml-1 text-xs font-normal text-[var(--foreground-muted)]">/{formatBillingCycle(subscription.billingCycle)}</span></div><div className="text-sm text-[var(--foreground-secondary)]"><span className="lg:hidden">Original · </span>{currency(subscription.originalPrice)}</div><div className="text-sm text-[var(--foreground-secondary)]"><span className="lg:hidden">Renews · </span>{shortDate(subscription.nextRenewal)}<span className={`ml-1 text-xs ${days <= 14 ? 'font-bold text-[var(--warning)]' : 'text-[var(--foreground-muted)]'}`}>({days}d)</span></div><div><StatusBadge tone={statusTone[subscription.status]}>{statusLabel[subscription.status]}</StatusBadge></div></Link>})}</div></>}</Panel>
+  </>
+}
+
