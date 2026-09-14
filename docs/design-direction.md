@@ -1,8 +1,8 @@
-# SpendGuard design direction
+# AfterPrice design direction
 
 ## Source and constraint
 
-Eight reference images are now available as the eight `codex-clipboard-*.png` files in `C:\Users\notsa\AppData\Local\Temp`. They were inspected directly on 6 September 2026. This direction synthesises those references with SpendGuard's product truth; it does not clone any one of them.
+Eight reference images are now available as the eight `codex-clipboard-*.png` files in `C:\Users\notsa\AppData\Local\Temp`. They were inspected directly on 6 September 2026. This direction synthesises those references with AfterPrice's product truth; it does not clone any one of them.
 
 Observed evidence by reference:
 
@@ -17,7 +17,7 @@ Observed evidence by reference:
 
 ## Product mechanism
 
-SpendGuard is a personal money watchdog. It records a purchase or subscription baseline, monitors the change, calculates the financial impact and gives the user a clear next action. The shared visual language must make this monitoring loop feel like one calm system, not three separate products.
+AfterPrice is a personal money watchdog. It records a purchase or subscription baseline, monitors the change, calculates the financial impact and gives the user a clear next action. The shared visual language must make this monitoring loop feel like one calm system, not three separate products.
 
 ## Committed world: the quiet watchtower
 
@@ -27,7 +27,7 @@ The form is an editorial monitoring ledger: large, tightly set headlines; genero
 
 ## First viewport contract
 
-The public hero should make the mechanism visible immediately: a large “Stop losing money after you buy.” headline sits beside a dark SpendGuard monitor surface showing one price-drop event, one renewal event and their next actions. The primary action is “Try the demo”; supporting navigation is quiet. On the app shell, the overview task is visible at once: potential impact, active alerts and the next renewal, with status encoded by text, icon and colour together.
+The public hero should make the mechanism visible immediately: a large “Stop losing money after you buy.” headline sits beside a dark AfterPrice monitor surface showing one price-drop event, one renewal event and their next actions. The primary action is “Try the demo”; supporting navigation is quiet. On the app shell, the overview task is visible at once: potential impact, active alerts and the next renewal, with status encoded by text, icon and colour together.
 
 ## Visual material
 
@@ -40,7 +40,7 @@ The public hero should make the mechanism visible immediately: a large “Stop l
 
 ## Composition rules from the evidence
 
-- Keep the first viewport asymmetric and proof-led: one large SpendGuard statement plus a coherent monitoring surface, not a generic centred SaaS hero.
+- Keep the first viewport asymmetric and proof-led: one large AfterPrice statement plus a coherent monitoring surface, not a generic centred SaaS hero.
 - Use thin dividers, grouped modules and a single strong chart or comparison visual for analytical confidence. Avoid competing chart colours.
 - Reserve full dark sections for a meaningful product showcase or final CTA. Use pale blue/indigo surfaces for data emphasis, never random decoration.
 - Let editorial scale alternate with operational density: a large headline earns a compact evidence panel; a dense table earns surrounding quiet.

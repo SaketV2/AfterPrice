@@ -1,4 +1,4 @@
-# SpendGuard design system
+# AfterPrice design system
 
 This is the shared visual contract for marketing and product surfaces. Product facts come from the master brief. Demo amounts are illustrative and must be labelled as such where a visitor could mistake them for proof.
 

@@ -1,36 +1,56 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
-import { ThemeProvider } from "@/lib/theme";
+import { ThemeProvider, type Theme } from "@/lib/theme";
+import { createClient } from "@/lib/supabase/server";
+
+const instrumentSans = localFont({
+  src: "./fonts/InstrumentSans-Variable.ttf",
+  variable: "--font-instrument-sans",
+  display: "swap",
+  weight: "400 700",
+  fallback: ["Segoe UI", "Arial", "sans-serif"],
+});
 
 export const metadata: Metadata = {
   title: {
-    default: "SpendGuard | Stop losing money after you buy",
-    template: "%s | SpendGuard",
+    default: "AfterPrice | Stop losing money after you buy",
+    template: "%s | AfterPrice",
   },
   description:
-    "SpendGuard watches purchases, subscriptions and renewals so you can catch price drops, plan changes and costly renewals.",
-  applicationName: "SpendGuard",
+    "Track a purchase or subscription once. Get alerted when the price drops, the plan changes or the next renewal becomes more expensive, with the evidence and deadline you need to act.",
+  applicationName: "AfterPrice",
   openGraph: {
-    title: "SpendGuard | Stop losing money after you buy",
+    title: "AfterPrice | Stop losing money after you buy",
     description:
-      "A personal money watchdog for price drops, plan changes and upcoming renewals.",
+      "Track a purchase or subscription once. Get alerted when the price drops, the plan changes or the next renewal becomes more expensive, with the evidence and deadline you need to act.",
     type: "website",
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+const designContract = `<!--
+  THESIS: AfterPrice makes change after purchase legible through baseline, change, evidence, deadline, action and resolution, refusing a generic finance dashboard.
+  OWN-WORLD: Warm light neutrals, graphite product surfaces, cobalt controls, signal-lime opportunities and restrained instrument-like UI.
+  STORY: A visitor sees what they originally paid, what moved, what evidence exists and the next realistic action.
+  FIRST VIEWPORT: Public routes pair the factual promise with a monitor surface and demo action; app routes foreground impact, alerts, evidence and deadlines.
+  FORM: Editorial monitoring instrument, committed from the supplied AfterPrice redesign brief; direction seed 87bf7606.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+-->`;
+
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  let defaultTheme: Theme = "system";
+  if (typeof claims?.claims?.sub === "string") {
+    const { data: preferences } = await supabase.from("user_preferences").select("theme").eq("user_id", claims.claims.sub).maybeSingle();
+    if (preferences?.theme === "light" || preferences?.theme === "dark" || preferences?.theme === "system") defaultTheme = preferences.theme;
+  }
   return (
-    <html lang="en-AU" suppressHydrationWarning>
+    <html lang="en-AU" className={instrumentSans.variable} suppressHydrationWarning>
       <body>
-        {/*
-          THESIS: SpendGuard makes the quiet cost change visible, refusing the generic SaaS hero that hides the mechanism.
-          OWN-WORLD: Cool paper ground, ink typography, indigo signal, powder-blue comparison and dark watchtower panels.
-          STORY: A visitor sees a monitored item, understands its financial consequence, and acts on the next clear step.
-          FIRST VIEWPORT: Public routes place the large product promise beside an immediate monitor surface and a Try the demo action; app routes foreground impact and alerts.
-          FORM: Quiet watchtower editorial ledger, committed from the written reference synthesis; concept-seed was blocked by the missing root PRODUCT.md interview in this worker context.
-          FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
-        */}
-        <ThemeProvider>{children}</ThemeProvider>
+        <a href="#main-content" className="skip-link">Skip to main content</a>
+        <div aria-hidden="true" hidden dangerouslySetInnerHTML={{ __html: designContract }} />
+        <ThemeProvider defaultTheme={defaultTheme}>{children}</ThemeProvider>
       </body>
     </html>
   );

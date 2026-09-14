@@ -1,0 +1,2 @@
+'use client'
+export default function AppError({ reset }: { error: Error; reset: () => void }) { return <div className="rounded-2xl bg-[var(--danger-soft)] p-6"><h2 className="font-display text-xl font-bold text-[var(--danger)]">The application data could not be loaded.</h2><p className="mt-2 text-sm text-[var(--foreground-secondary)]">Check your connection, then try again.</p><button onClick={reset} className="mt-5 min-h-11 rounded-xl bg-[var(--surface-dark)] px-4 text-sm font-bold text-white">Try again</button></div> }

@@ -1,41 +1,121 @@
-import { ButtonLink, Eyebrow, FaqAccordion, Reveal, SectionIntro } from '@/components/marketing/marketing-ui'
-import { MonitorPreview, SavingsChart } from '@/components/marketing/product-preview'
-import { faqItems, productSignals, resources, valueStrip } from '@/components/marketing/marketing-data'
+import { ArrowUpRightIcon, ButtonLink, FaqAccordion } from '@/components/marketing/marketing-ui'
+import { ChangeRail, LiveChangeFeed, Lifecycle } from '@/components/marketing/product-preview'
+import { capabilityRows, changeTypes, coverageItems, faqItems } from '@/components/marketing/marketing-data'
 
 export default function HomePage() {
-  return <main>
-    <section className="relative overflow-hidden px-5 pb-20 pt-8 sm:px-8 sm:pb-28 sm:pt-14 lg:px-10 lg:pb-36 lg:pt-20">
-      <div className="pointer-events-none absolute left-[-12rem] top-[-14rem] size-[34rem] rounded-full bg-[#e7eafe] opacity-70 blur-3xl" />
-      <div className="relative mx-auto grid max-w-[1280px] items-center gap-14 lg:grid-cols-[.9fr_1.1fr] lg:gap-16">
-        <Reveal>
-          <Eyebrow>One calm system for changing costs</Eyebrow>
-          <h1 className="max-w-[690px] font-[family-name:var(--font-display)] text-[clamp(3.5rem,7.2vw,6.7rem)] font-750 leading-[.94] tracking-[-.07em] text-[#0c0f14]">Stop losing money after you buy.</h1>
-          <p className="mt-7 max-w-xl text-lg leading-8 text-[#5d6673] sm:text-xl">SpendGuard watches your purchases, subscriptions and renewals so you can catch price drops, plan changes and costly renewals before they cost you more.</p>
-          <div className="mt-9 flex flex-wrap items-center gap-3"><ButtonLink href="/demo">Try the demo <span aria-hidden="true">↗</span></ButtonLink><ButtonLink href="/how-it-works" variant="secondary">See how it works</ButtonLink></div>
-          <p className="mt-5 text-xs text-[#818b99]">Interactive demo · no bank connection · sample data clearly labelled</p>
-        </Reveal>
-        <Reveal className="lg:translate-y-5"><MonitorPreview /></Reveal>
-      </div>
-    </section>
+  return (
+    <main>
+      <section className="px-5 pb-16 pt-10 sm:px-8 sm:pb-20 sm:pt-14 lg:px-10 lg:pb-24 lg:pt-16">
+        <div className="mx-auto grid max-w-[1280px] items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
+          <div className="min-w-0">
+            <h1 className="max-w-[11ch] font-[family-name:var(--font-display)] text-[clamp(3rem,5.6vw,5.5rem)] font-750 leading-[1.02] tracking-[-0.04em] text-[#0c0f14]">Stop losing money after you buy.</h1>
+            <p className="mt-6 max-w-lg text-base leading-7 text-[#5d6673] sm:text-lg sm:leading-8">Track a purchase or subscription once. See when the price drops, the plan changes or the next renewal costs more, with the evidence and timing to decide what to do.</p>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <ButtonLink href="/demo">Open interactive demo <ArrowUpRightIcon /></ButtonLink>
+              <a href="#lifecycle" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#3258d4] underline decoration-[#3258d4]/30 underline-offset-4 hover:decoration-current">See how monitoring works <ArrowUpRightIcon /></a>
+            </div>
+            <p className="mt-4 text-xs leading-5 text-[#68717e]">No bank connection · Sample data clearly labelled</p>
+          </div>
+          <div className="min-w-0">
+            <ChangeRail />
+          </div>
+        </div>
+      </section>
 
-    <section className="border-y border-[#e1e5ea] bg-white/65"><div className="mx-auto grid max-w-[1280px] grid-cols-2 divide-x divide-y divide-[#e1e5ea] sm:grid-cols-4 sm:divide-y-0">{valueStrip.map((item, index) => <div key={item} className="flex min-h-20 items-center gap-3 px-5 py-5 text-sm font-semibold text-[#3f4854] sm:px-7"><span className="font-mono text-xs text-[#6875f5]">0{index + 1}</span>{item}</div>)}</div></section>
+      <LiveChangeFeed />
+      <Lifecycle />
 
-    <section className="px-5 py-24 sm:px-8 sm:py-32 lg:px-10"><div className="mx-auto max-w-[1280px]"><SectionIntro eyebrow="The monitoring loop" title="Every tracked item follows one simple path." description="Establish a baseline, watch for a meaningful change, understand the impact, then decide what deserves your attention." /><div className="mt-16 grid gap-5 md:grid-cols-3">{[['01', 'Add what you buy', 'Save a purchase or subscription with the details that matter: price, terms and the next date.'], ['02', 'SpendGuard watches it', 'The monitor compares your baseline with the price, plan and renewal information you see now.'], ['03', 'Act when something changes', 'Get a plain-language alert with the amount at stake and a clear next step, never a vague notification.']].map(([number, title, text], index) => <Reveal key={number} className={`rounded-[28px] border border-[#e1e5ea] bg-white p-6 sm:p-8 ${index === 1 ? 'md:translate-y-8' : ''}`}><span className="font-mono text-sm text-[#6875f5]">{number}</span><h3 className="mt-16 font-[family-name:var(--font-display)] text-2xl font-700 tracking-[-.04em]">{title}</h3><p className="mt-4 text-sm leading-7 text-[#5d6673]">{text}</p></Reveal>)}</div></div></section>
+      <section className="border-y border-[#e1e5ea] bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
+            <div>
+              <h2 className="max-w-lg font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] sm:text-5xl">Price, plan and renewal changes use the same decision path.</h2>
+            </div>
+            <p className="max-w-xl text-base leading-7 text-[#5d6673]">The category changes. The useful information does not: baseline, current state, consequence, timing, evidence and a next action.</p>
+            <p className="text-xs text-[#68717e] lg:col-span-2">Illustrative records · Potential amounts are not confirmed recovery</p>
+          </div>
+          <div className="mt-12 divide-y divide-[#d8dde5] border-y border-[#d8dde5]">
+            {changeTypes.map(item => (
+              <div key={item.category} className="grid grid-cols-2 gap-x-5 gap-y-4 py-6 lg:grid-cols-[1.2fr_0.85fr_0.85fr_1fr_1fr] lg:items-start lg:gap-6">
+                <div className="col-span-2 lg:col-span-1"><p className="text-xs font-semibold text-[#3258d4]">{item.category}</p><h3 className="mt-1 text-lg font-bold leading-6 tracking-[-0.02em]">{item.title}</h3></div>
+                <div><p className="text-xs text-[#68717e]">Baseline</p><p className="mt-1 text-sm font-semibold tabular-nums">{item.baseline}</p></div>
+                <div><p className="text-xs text-[#68717e]">Current</p><p className="mt-1 text-sm font-semibold tabular-nums">{item.current}</p></div>
+                <div><p className="text-xs text-[#68717e]">Consequence</p><p className="mt-1 text-sm font-semibold">{item.consequence}</p></div>
+                <div><p className="text-xs text-[#68717e]">Next action</p><p className="mt-1 text-sm font-semibold text-[#3258d4]">{item.action}</p></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    <section className="bg-[#101a2a] px-5 py-24 text-white sm:px-8 sm:py-32 lg:px-10"><div className="mx-auto max-w-[1280px]"><div className="grid gap-14 lg:grid-cols-[.75fr_1.25fr] lg:items-end"><SectionIntro light eyebrow="PriceClaim · PlanGuard · RenewalAudit" title="One watchdog. Three ways money slips away." description="The product is unified by the decision it helps you make: what changed, what it costs and whether it deserves action." /><div className="flex justify-start lg:justify-end"><ButtonLink href="/how-it-works" variant="light">See the full system <span aria-hidden="true">↗</span></ButtonLink></div></div><div className="mt-16 grid gap-4 lg:grid-cols-3">{productSignals.map((signal, index) => <Reveal key={signal.eyebrow} className={`rounded-[24px] border border-[#283241] bg-[#131922] p-6 sm:p-7 ${index === 1 ? 'lg:translate-y-6' : ''}`}><p className="text-[10px] font-bold tracking-[.16em] text-[#8792ff]">{signal.eyebrow}</p><h3 className="mt-8 max-w-xs font-[family-name:var(--font-display)] text-2xl font-700 leading-tight tracking-[-.045em]">{signal.title}</h3><p className="mt-4 text-sm leading-6 text-[#aab3c0]">{signal.description}</p><div className="mt-8 flex items-end justify-between border-t border-[#283241] pt-5"><div><p className="text-[11px] text-[#788492]">{signal.label}</p><p className="mt-1 text-2xl font-bold text-[#cfe3f5]">{signal.value}</p></div><p className="text-right text-[11px] leading-5 text-[#aab3c0]">{signal.meta}</p></div></Reveal>)}</div></div></section>
+      <section className="bg-[#101a2a] px-5 py-20 text-white sm:px-8 sm:py-28 lg:px-10">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <h2 className="max-w-xl font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] sm:text-5xl">Useful now. Clear about what is still manual.</h2>
+            </div>
+            <p className="max-w-xl text-base leading-7 text-[#c0c8d2]">The demo proves the record and decision flow. It does not pretend to have retailer access, a claim outcome or a bank connection.</p>
+          </div>
+          <div className="mt-10 overflow-hidden rounded-[16px] border border-[#283241]">
+            <table className="w-full table-fixed border-collapse text-left text-sm">
+              <caption className="sr-only">AfterPrice capabilities in the V1 demo</caption>
+              <thead className="bg-[#1a2230] text-xs uppercase tracking-[0.12em] text-[#aab3c0]">
+                <tr><th scope="col" className="w-[62%] px-4 py-4 font-semibold sm:px-6">Capability</th><th scope="col" className="px-4 py-4 font-semibold sm:px-6">V1 status</th></tr>
+              </thead>
+              <tbody className="divide-y divide-[#283241]">
+                {capabilityRows.map(([capability, status]) => (
+                  <tr key={capability}><th scope="row" className="px-4 py-4 align-top font-medium leading-6 text-[#f5f7fa] sm:px-6">{capability}</th><td className={['px-4 py-4 align-top text-xs font-semibold leading-6 sm:px-6', status.startsWith('Available') ? 'text-[#b7bd91]' : 'text-[#f0bd71]'].join(' ')}>{status}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-    <section className="px-5 py-24 sm:px-8 sm:py-32 lg:px-10"><div className="mx-auto max-w-[1280px]"><div className="grid gap-14 lg:grid-cols-[.65fr_1.35fr] lg:items-center"><SectionIntro eyebrow="See the full picture" title="A quieter way to keep an eye on your money." description="The overview turns scattered changes into one calm, prioritised view. No banking dashboard, no endless spreadsheet, no noise for its own sake." /><Reveal><MonitorPreview compact /></Reveal></div><div className="mt-16 grid gap-5 md:grid-cols-3"><div className="rounded-[24px] bg-[#e8edf4] p-6 sm:p-8"><p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#6875f5]">Baseline</p><p className="mt-10 font-[family-name:var(--font-display)] text-4xl font-700 tracking-[-.06em]">$349</p><p className="mt-2 text-sm text-[#5d6673]">What you paid, with context.</p></div><div className="rounded-[24px] border border-[#e1e5ea] bg-white p-6 sm:p-8"><p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#6875f5]">Signal</p><p className="mt-10 font-[family-name:var(--font-display)] text-4xl font-700 tracking-[-.06em]">−$50</p><p className="mt-2 text-sm text-[#5d6673]">A change worth reviewing.</p></div><div className="rounded-[24px] bg-[#e7eafe] p-6 sm:p-8"><p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#6875f5]">Next action</p><p className="mt-10 font-[family-name:var(--font-display)] text-4xl font-700 tracking-[-.06em]">4 days</p><p className="mt-2 text-sm text-[#5d6673]">A clear window to decide.</p></div></div></div></section>
+      <section id="coverage" className="px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
+        <div className="mx-auto grid max-w-[1100px] gap-8 lg:grid-cols-2 lg:gap-14">
+          <div>
+            <h2 className="max-w-xl font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] sm:text-5xl">Track the changes that happen after the receipt.</h2>
+            <p className="mt-5 max-w-xl text-base leading-7 text-[#5d6673]">Start with the records where a later price, plan or renewal detail can change the decision you make.</p>
+          </div>
+          <ul className="divide-y divide-[#d8dde5] border-y border-[#d8dde5]">
+            {coverageItems.map(item => <li key={item} className="py-4 text-sm font-semibold">{item}</li>)}
+          </ul>
+        </div>
+      </section>
 
-    <section className="bg-[#0c1016] px-5 py-24 text-white sm:px-8 sm:py-32 lg:px-10"><div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[.85fr_1.15fr] lg:items-center"><SectionIntro light eyebrow="Potential impact" title="The useful number is the one that changes your decision." description="SpendGuard puts price differences and annual impact into context, so a notification becomes something you can act on." /><SavingsChart /></div></section>
+      <section id="data" className="border-y border-[#e1e5ea] bg-[#eef0f5] px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
+        <div className="mx-auto grid max-w-[1100px] gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <div>
+            <h2 className="max-w-xl font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] sm:text-5xl">The demo keeps its boundaries visible.</h2>
+            <p className="mt-5 max-w-xl text-base leading-7 text-[#5d6673]">The visual examples on this page are illustrative. Your account records are private to your authenticated workspace, and no bank account or retailer login is required.</p>
+          </div>
+          <div className="divide-y divide-[#cfd5dd] border-y border-[#cfd5dd]">
+            <div className="py-4"><p className="text-sm font-bold">Illustrative examples</p><p className="mt-1 text-sm leading-6 text-[#5d6673]">Public examples show how a lower price, changed plan or renewal can be presented.</p></div>
+            <div className="py-4"><p className="text-sm font-bold">Your account</p><p className="mt-1 text-sm leading-6 text-[#5d6673]">Authenticated workspaces start empty and only contain records you add.</p></div>
+            <div className="py-4"><p className="text-sm font-bold">Still manual</p><p className="mt-1 text-sm leading-6 text-[#5d6673]">Claims, cancellations and unsupported provider checks remain your responsibility.</p></div>
+          </div>
+        </div>
+      </section>
 
-    <section className="px-5 py-24 sm:px-8 sm:py-32 lg:px-10"><div className="mx-auto max-w-[1280px]"><div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end"><SectionIntro eyebrow="Built around the moments that matter" title="Enough signal to make a better call." /><ButtonLink href="/how-it-works" variant="secondary">How it works <span aria-hidden="true">↗</span></ButtonLink></div><div className="mt-14 grid gap-px overflow-hidden rounded-[28px] border border-[#e1e5ea] bg-[#e1e5ea] sm:grid-cols-2 lg:grid-cols-3">{[['01', 'Price monitoring', 'Catch a lower price while the opportunity is still relevant.'], ['02', 'Plan history', 'Compare what you bought with what your plan became.'], ['03', 'Renewal warnings', 'See the next charge and annual impact before it lands.'], ['04', 'Unified alerts', 'One prioritised stream for purchases, plans and renewals.'], ['05', 'Historical snapshots', 'Keep a reliable baseline instead of relying on memory.'], ['06', 'Claim guidance', 'Get a plain-language checklist, never a false promise.']].map(([n, title, text]) => <div key={n} className="bg-[#f6f6f3] p-6 transition hover:bg-white sm:p-8"><span className="font-mono text-xs text-[#6875f5]">{n}</span><h3 className="mt-12 font-[family-name:var(--font-display)] text-xl font-700 tracking-[-.035em]">{title}</h3><p className="mt-3 text-sm leading-6 text-[#5d6673]">{text}</p></div>)}</div></div></section>
+      <section className="px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
+        <div className="mx-auto grid max-w-[1100px] gap-12 lg:grid-cols-[0.7fr_1.3fr]">
+          <div>
+            <h2 className="max-w-md font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] sm:text-5xl">What the V1 demo does, in plain terms.</h2>
+          </div>
+          <FaqAccordion items={faqItems} />
+        </div>
+      </section>
 
-    <section className="px-5 pb-24 sm:px-8 sm:pb-32 lg:px-10"><div className="mx-auto max-w-[1280px] rounded-[28px] bg-[#6875f5] px-6 py-14 text-white sm:px-12 sm:py-20 lg:px-16"><div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end"><div><Eyebrow light>Interactive demo</Eyebrow><h2 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.02] tracking-[-.055em] sm:text-6xl">See what SpendGuard catches.</h2><p className="mt-5 max-w-xl text-base leading-7 text-[#eef0ff]">Open a seeded account and explore the moments where a little context can protect a lot of money.</p></div><ButtonLink href="/demo" variant="light">Try the demo <span aria-hidden="true">↗</span></ButtonLink></div></div></section>
-
-    <section className="border-t border-[#e1e5ea] px-5 py-24 sm:px-8 sm:py-32 lg:px-10"><div className="mx-auto max-w-[1280px]"><div className="grid gap-14 lg:grid-cols-[.75fr_1.25fr]"><SectionIntro eyebrow="From the field notes" title="Useful thinking for the costs that change quietly." description="No hype, no fake savings claims. Just practical ways to inspect the prices and plans you already pay for." /><div className="grid gap-4 sm:grid-cols-2">{resources.slice(0, 4).map(resource => <a href={`/resources/${resource.slug}`} key={resource.slug} className="group rounded-[20px] border border-[#e1e5ea] bg-white p-5 transition hover:-translate-y-1 hover:border-[#b4bcf8] hover:shadow-[0_12px_36px_rgba(12,15,20,.08)]"><div className={`h-24 rounded-2xl bg-gradient-to-br ${resource.accent}`} /><p className="mt-5 text-[10px] font-bold uppercase tracking-[.14em] text-[#6875f5]">{resource.category}</p><h3 className="mt-2 font-[family-name:var(--font-display)] text-lg font-700 leading-tight tracking-[-.03em] group-hover:text-[#5967e8]">{resource.title}</h3><p className="mt-3 text-xs leading-5 text-[#5d6673]">{resource.readTime}</p></a>)}</div></div></div></section>
-
-    <section className="px-5 py-24 sm:px-8 sm:py-32 lg:px-10"><div className="mx-auto grid max-w-[1100px] gap-14 lg:grid-cols-[.7fr_1.3fr]"><SectionIntro eyebrow="Questions, answered" title="Clear about what V1 can do." description="The demo is honest by design. Explore the product without pretending the hard parts are already automated." /><FaqAccordion items={faqItems.slice(0, 4)} /></div></section>
-
-    <section className="px-5 pb-28 sm:px-8 sm:pb-40 lg:px-10"><div className="mx-auto max-w-[1280px] overflow-hidden rounded-[28px] bg-[#e8edf4] px-6 py-14 sm:px-12 sm:py-20 lg:px-16"><div className="max-w-3xl"><Eyebrow>The money is already yours</Eyebrow><h2 className="font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.02] tracking-[-.055em] sm:text-6xl">Stop letting it disappear quietly.</h2><div className="mt-8 flex flex-wrap gap-3"><ButtonLink href="/signup">Start watching <span aria-hidden="true">↗</span></ButtonLink><ButtonLink href="/pricing" variant="secondary">View pricing</ButtonLink></div></div></div></section>
-  </main>
+      <section className="px-5 pb-24 sm:px-8 sm:pb-32 lg:px-10">
+        <div className="mx-auto grid max-w-[1280px] gap-8 rounded-[16px] bg-[#e1f3ea] px-6 py-10 sm:px-10 sm:py-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:px-14">
+          <div>
+            <h2 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] text-[#0c1016] sm:text-5xl">Save your first baseline and make later changes visible.</h2>
+            <p className="mt-5 max-w-xl text-base leading-7 text-[#246347]">Create an account, add a purchase or subscription, then keep the next useful action beside the record.</p>
+          </div>
+          <ButtonLink href="/signup" variant="primary">Get started <ArrowUpRightIcon /></ButtonLink>
+        </div>
+      </section>
+    </main>
+  )
 }

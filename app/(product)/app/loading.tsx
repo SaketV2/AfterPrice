@@ -1,0 +1,1 @@
+export default function AppLoading() { return <div aria-label="Loading application" className="space-y-4"><div className="h-10 w-64 animate-pulse rounded-xl bg-[var(--surface-subtle)]" /><div className="h-56 animate-pulse rounded-2xl bg-[var(--surface-subtle)]" /></div> }

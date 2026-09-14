@@ -1,4 +1,4 @@
-export type ResourceCategory = 'PriceClaim' | 'PlanGuard' | 'RenewalAudit' | 'Practical'
+export type ResourceCategory = 'Price change' | 'Plan change' | 'Renewal' | 'Practical'
 
 export type Resource = {
   slug: string
@@ -11,29 +11,225 @@ export type Resource = {
   sections: Array<{ heading: string; body: string }>
 }
 
+export type ChangeRecord = {
+  id: string
+  category: 'Price' | 'Plan' | 'Renewal'
+  label: string
+  title: string
+  provider: string
+  status: string
+  statusTone: 'positive' | 'warning' | 'negative'
+  baseline: string
+  current: string
+  difference: string
+  observed: string
+  deadline: string
+  summary: string
+  evidence: Array<{ label: string; value: string }>
+  action: string
+}
+
+export const liveChanges: ChangeRecord[] = [
+  {
+    id: 'sony-price-drop',
+    category: 'Price',
+    label: 'Price change',
+    title: 'WH-1000XM6 headphones',
+    provider: 'Sony Store',
+    status: 'Price drop',
+    statusTone: 'positive',
+    baseline: '$349',
+    current: '$299',
+    difference: 'Potential $50 claim',
+    observed: '06 Sep 2026, 11:42 AM',
+    deadline: '4 days remaining',
+    summary: 'The same model is listed $50 below the saved purchase price.',
+    evidence: [
+      { label: 'Saved baseline', value: 'Receipt · 02 Sep 2026' },
+      { label: 'Latest source', value: 'Sony Store product page' },
+      { label: 'Source status', value: 'Available · matched model' },
+    ],
+    action: 'Review the retailer adjustment policy',
+  },
+  {
+    id: 'designtool-plan-change',
+    category: 'Plan',
+    label: 'Plan change',
+    title: 'DesignTool Pro',
+    provider: 'DesignTool',
+    status: 'Plan changed',
+    statusTone: 'negative',
+    baseline: '100 GB storage',
+    current: '50 GB storage',
+    difference: 'Included storage reduced',
+    observed: '05 Sep 2026, 4:16 PM',
+    deadline: 'Review before next renewal',
+    summary: 'The saved plan included 100 GB. The current plan page lists 50 GB.',
+    evidence: [
+      { label: 'Saved baseline', value: 'Plan snapshot · 16 Aug 2026' },
+      { label: 'Latest source', value: 'DesignTool pricing page' },
+      { label: 'Source status', value: 'Available · plan name matched' },
+    ],
+    action: 'Compare current plan limits',
+  },
+  {
+    id: 'internet-renewal',
+    category: 'Renewal',
+    label: 'Renewal',
+    title: 'Home internet plan',
+    provider: 'Northline Internet',
+    status: 'Renewal soon',
+    statusTone: 'warning',
+    baseline: '$69 / month',
+    current: '$84 / month',
+    difference: '+$180 / year',
+    observed: '04 Sep 2026, 8:05 AM',
+    deadline: '8 days remaining',
+    summary: 'The next renewal is $15 more per month than the saved price.',
+    evidence: [
+      { label: 'Saved baseline', value: 'Invoice · 10 Sep 2025' },
+      { label: 'Latest source', value: 'Renewal notice in demo inbox' },
+      { label: 'Source status', value: 'Available · date confirmed' },
+    ],
+    action: 'Check alternatives before renewal',
+  },
+]
+
+export const lifecycleSteps = [
+  {
+    name: 'Baseline',
+    title: 'Save what was true when you bought.',
+    description: 'A receipt, plan snapshot or renewal amount becomes the reference point for every later check.',
+    value: '$349',
+    subvalue: 'Sony WH-1000XM6 · 02 Sep 2026',
+    tone: 'baseline',
+  },
+  {
+    name: 'Change',
+    title: 'See the difference, not just an alert.',
+    description: 'AfterPrice puts the original value beside the latest observed value so the change has context.',
+    value: '$299',
+    subvalue: 'Current listing · $50 below baseline',
+    tone: 'change',
+  },
+  {
+    name: 'Evidence',
+    title: 'Inspect where the signal came from.',
+    description: 'Each record keeps the source, timestamp and match status beside the comparison.',
+    value: '11:42',
+    subvalue: '06 Sep 2026 · source available',
+    tone: 'evidence',
+  },
+  {
+    name: 'Deadline',
+    title: 'Know if waiting makes it less useful.',
+    description: 'A countdown puts the relevant window next to the difference. No countdown means no invented urgency.',
+    value: '4 days',
+    subvalue: 'Retailer adjustment window',
+    tone: 'deadline',
+  },
+  {
+    name: 'Action',
+    title: 'Choose the next move.',
+    description: 'Review, claim, keep, change or dismiss. AfterPrice gives guidance, while the outcome stays yours.',
+    value: 'Review',
+    subvalue: 'Retailer policy and exact model',
+    tone: 'action',
+  },
+  {
+    name: 'Resolution',
+    title: 'Record what happened.',
+    description: 'Potential money remains potential until an outcome is confirmed and recorded in the ledger.',
+    value: 'Open',
+    subvalue: 'No recovery recorded yet',
+    tone: 'resolution',
+  },
+]
+
+export const changeTypes = [
+  {
+    category: 'Price change',
+    title: 'The price moved after checkout.',
+    baseline: '$349 paid',
+    current: '$299 now',
+    consequence: '$50 potential difference',
+    action: 'Review adjustment terms',
+  },
+  {
+    category: 'Plan change',
+    title: 'The plan became less useful.',
+    baseline: '100 GB included',
+    current: '50 GB listed',
+    consequence: 'Storage reduced',
+    action: 'Compare plan limits',
+  },
+  {
+    category: 'Renewal',
+    title: 'The next recurring charge increased.',
+    baseline: '$69 / month',
+    current: '$84 / month',
+    consequence: '+$180 / year',
+    action: 'Review before renewal',
+  },
+]
+
+export const capabilityRows = [
+  ['Save a purchase or subscription baseline', 'Available in demo'],
+  ['Compare illustrative price, plan and renewal records', 'Available in demo'],
+  ['Show source, observed time and a next action', 'Available in demo'],
+  ['Automatically check every retailer', 'Not supported in V1'],
+  ['Submit a claim, cancel a service or guarantee a refund', 'Not supported in V1'],
+]
+
+export const coverageItems = [
+  'Retail purchase prices after checkout',
+  'Subscription plan names, prices and included limits',
+  'Recurring charges and upcoming renewal dates',
+  'Manual records where an automated source is unavailable',
+]
+
+export const faqItems = [
+  {
+    question: 'What does AfterPrice monitor?',
+    answer: 'AfterPrice compares a saved purchase price, subscription plan or renewal amount with later information. Public examples show all three as one change ledger, while your account records stay private.',
+  },
+  {
+    question: 'Does AfterPrice claim refunds automatically?',
+    answer: 'No. It shows the difference, evidence and relevant timing so you can review the provider policy and submit a claim yourself.',
+  },
+  {
+    question: 'Do I need to connect my bank account?',
+    answer: 'No. Add the purchase or subscription details you want to monitor. Account access uses Supabase authentication, and you should never enter bank credentials or retailer passwords.',
+  },
+  {
+    question: 'What remains manual?',
+    answer: 'Retailer checks without a supported source, claim submission, subscription cancellation and payments remain manual in this V1. Account authentication is real.',
+  },
+]
+
 export const resources: Resource[] = [
   {
     slug: 'post-purchase-price-adjustments',
     title: 'How post-purchase price adjustments work',
     excerpt: 'A practical way to check whether a price drop is still inside a retailer’s adjustment window.',
-    category: 'PriceClaim',
+    category: 'Price change',
     readTime: '6 min read',
     date: '18 Jun 2026',
-    accent: 'from-[#dceaf6] to-[#eef2ff]',
+    accent: 'blue',
     sections: [
-      { heading: 'A purchase is not the end of the story', body: 'Retail prices move constantly. Some retailers offer a short adjustment window after you buy, while others handle a claim through a support form or store policy. SpendGuard keeps the original purchase price beside the current price so you know when it is worth checking.' },
+      { heading: 'A purchase is not the end of the story', body: 'Retail prices move constantly. Some retailers offer a short adjustment window after you buy, while others handle a claim through a support form or store policy. AfterPrice keeps the original purchase price beside the current price so you know when it is worth checking.' },
       { heading: 'What to check first', body: 'Start with the retailer’s policy, the exact product variant and the dates. A lower price alone is not a promise of money back. It is a signal to review the terms and decide whether a claim is worth your time.' },
-      { heading: 'A calmer way to monitor it', body: 'Instead of remembering every price you paid, save the purchase once. SpendGuard can flag a meaningful drop, show the remaining window and give you a clear checklist for the next step.' },
+      { heading: 'Use the signal well', body: 'Save the purchase once, then review the difference, deadline and evidence together. The goal is a specific decision, not another stream of vague notifications.' },
     ],
   },
   {
     slug: 'software-subscriptions-get-expensive',
-    title: 'Why software subscriptions quietly become more expensive',
+    title: 'Why software subscriptions become more expensive',
     excerpt: 'Price changes are only one part of a plan change. Read the terms that tend to move underneath you.',
-    category: 'PlanGuard',
+    category: 'Plan change',
     readTime: '7 min read',
     date: '12 Jun 2026',
-    accent: 'from-[#e9e9f8] to-[#e4f3ee]',
+    accent: 'green',
     sections: [
       { heading: 'The price is the obvious signal', body: 'A monthly fee can rise without an obvious change to your workflow. The harder part is noticing when storage, usage limits, exports or included seats move at the same time.' },
       { heading: 'Compare the promise with the current plan', body: 'Keep a snapshot of the plan you chose. Then compare price, limits and the features you actually rely on when renewal approaches.' },
@@ -44,10 +240,10 @@ export const resources: Resource[] = [
     slug: 'audit-recurring-payments',
     title: 'How to audit your recurring payments',
     excerpt: 'A simple quarterly review for finding renewals that deserve a second look.',
-    category: 'RenewalAudit',
+    category: 'Renewal',
     readTime: '5 min read',
     date: '04 Jun 2026',
-    accent: 'from-[#faedcf] to-[#f8e4e7]',
+    accent: 'amber',
     sections: [
       { heading: 'Work from the next renewal', body: 'Start with the subscriptions renewing soonest. The closer the date, the more useful a clear comparison between last year and this year becomes.' },
       { heading: 'Measure annual impact', body: 'A small monthly increase is easy to dismiss. Multiplying the difference by twelve gives you the number that belongs in the decision.' },
@@ -61,56 +257,11 @@ export const resources: Resource[] = [
     category: 'Practical',
     readTime: '4 min read',
     date: '28 May 2026',
-    accent: 'from-[#e4f2f1] to-[#e6e8fa]',
+    accent: 'blue',
     sections: [
       { heading: 'Check the date and the amount', body: 'Confirm the renewal date, the amount that will be charged and the payment method. Then compare each against last year’s baseline.' },
       { heading: 'Read the current limits', body: 'Look for changes to seats, storage, exports, usage and support. Annual plans often change in the details that are not visible in a simple price comparison.' },
       { heading: 'Choose an action', body: 'Decide before the reminder becomes an emergency. Keeping, changing or cancelling are all valid outcomes when they are deliberate.' },
     ],
   },
-  {
-    slug: 'track-saas-plan-changes',
-    title: 'How to track whether a SaaS plan changed',
-    excerpt: 'The useful baseline is the plan you bought, not the plan shown on the pricing page today.',
-    category: 'PlanGuard',
-    readTime: '6 min read',
-    date: '19 May 2026',
-    accent: 'from-[#eceaf8] to-[#f4efe4]',
-    sections: [
-      { heading: 'Save the original plan', body: 'Record the plan name, price and limits at the time you subscribe. That snapshot gives you something concrete to compare later.' },
-      { heading: 'Watch for quiet reductions', body: 'A plan can become less useful even when the name stays the same. Storage caps, quotas, seats and included tools are all part of the value.' },
-      { heading: 'Make changes visible', body: 'A short, plain-language summary is more useful than a dense change log. See what changed, what it costs and what you can do next.' },
-    ],
-  },
-  {
-    slug: 'when-a-lower-price-qualifies',
-    title: 'When a lower retail price may qualify for an adjustment',
-    excerpt: 'The difference between spotting a lower price and having a useful next step.',
-    category: 'PriceClaim',
-    readTime: '5 min read',
-    date: '08 May 2026',
-    accent: 'from-[#e6f0f6] to-[#ececf9]',
-    sections: [
-      { heading: 'Start with the policy', body: 'Retailers set their own rules, exclusions and timing. Check the policy for the item and region before assuming an adjustment applies.' },
-      { heading: 'Match the exact item', body: 'Colour, size, condition, seller and fulfilment can change whether two listings are actually comparable. SpendGuard helps you keep that context beside the price.' },
-      { heading: 'Use the signal wisely', body: 'A flag is a prompt to review, not a guaranteed outcome. The goal is to reclaim opportunities without spending an hour chasing a small difference.' },
-    ],
-  },
 ]
-
-export const faqItems = [
-  { question: 'What does SpendGuard actually monitor?', answer: 'SpendGuard monitors purchase prices after you buy, subscription prices and plan terms, and upcoming renewals. It brings relevant changes into one alert stream so you can decide what to do.' },
-  { question: 'Does SpendGuard automatically claim refunds?', answer: 'No. V1 gives you the price difference, timing and claim instructions so you can review the retailer policy and submit a claim yourself. We do not pretend to automate an outcome we cannot control.' },
-  { question: 'Do I need to connect my bank account?', answer: 'No. The V1 demo is manual-first. You can add a purchase or subscription, save a receipt workflow and see how the monitoring engine would work without giving up banking credentials.' },
-  { question: 'What happens to my data?', answer: 'The demo uses local sample data in your browser. SpendGuard is designed around the minimum information needed to monitor a purchase or plan, with clear control over what you add and remove.' },
-  { question: 'Is the demo real or just a visual mock-up?', answer: 'It is an interactive product demo with seeded data. Search, filters, details, alerts and add-item flows work locally. Authentication, retailer checks and payment processing are intentionally mocked for V1.' },
-  { question: 'Can I cancel a subscription from SpendGuard?', answer: 'Not in V1. SpendGuard highlights the renewal and plan change so you can make an informed choice, but it does not cancel services or submit changes on your behalf.' },
-]
-
-export const productSignals = [
-  { eyebrow: 'PRICECLAIM', title: 'A lower price should not become someone else’s profit.', description: 'Keep the price you paid next to the price today, with the claim window and a sensible next step.', label: 'Potential claim', value: '$50', meta: '4 days left' },
-  { eyebrow: 'PLANGUARD', title: 'Know when the plan you bought becomes worse.', description: 'See price, limits and included benefits side by side, so a quiet downgrade becomes an obvious decision.', label: 'Plan change', value: '52.6%', meta: 'price increase' },
-  { eyebrow: 'RENEWALAUDIT', title: 'Review the price before it renews.', description: 'See the next charge, annual impact and plan context before a recurring payment becomes automatic.', label: 'Annual impact', value: '+$180', meta: '8 days remaining' },
-]
-
-export const valueStrip = ['Watch purchases', 'Monitor subscriptions', 'Review renewals', 'Recover opportunities']

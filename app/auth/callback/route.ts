@@ -1,0 +1,15 @@
+import { NextResponse } from 'next/server'
+import { safeAppPath } from '@/lib/auth/redirects'
+import { createClient } from '@/lib/supabase/server'
+
+export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const code = url.searchParams.get('code')
+  const next = safeAppPath(url.searchParams.get('next') === '/reset-password' ? '/app' : url.searchParams.get('next'))
+  if (code) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) return NextResponse.redirect(new URL(url.searchParams.get('next') === '/reset-password' ? '/reset-password' : next, url.origin))
+  }
+  return NextResponse.redirect(new URL('/login?error=confirmation', url.origin))
+}

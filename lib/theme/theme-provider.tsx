@@ -26,7 +26,7 @@ function getSystemTheme(): "light" | "dark" {
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "spendguard-theme",
+  storageKey = "afterprice-theme",
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(defaultTheme);
   const [systemTheme, setSystemTheme] = React.useState<"light" | "dark">("light");

@@ -1,6 +1,8 @@
 import { OverviewDashboard } from '@/components/dashboard/overview-dashboard'
+import { getBaselines } from '@/features/afterprice/queries'
 
-export default function AppOverviewPage() {
-  return <OverviewDashboard />
+export const metadata = { title: 'Overview' }
+
+export default async function AppOverviewPage() {
+  return <OverviewDashboard records={await getBaselines()} />
 }
-

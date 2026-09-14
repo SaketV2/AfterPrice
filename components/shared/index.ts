@@ -4,5 +4,4 @@ export * from "./metric";
 export * from "./modal";
 export * from "./section";
 export * from "./stat-card";
-export * from "./status-badge";
 export * from "./theme-toggle";

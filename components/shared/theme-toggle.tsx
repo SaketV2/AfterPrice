@@ -9,7 +9,7 @@ export function ThemeToggle() {
   const nextTheme = theme === "light" ? "dark" : theme === "dark" ? "system" : "light";
   const Icon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
   return (
-    <Button aria-label={`Theme: ${theme}. Switch to ${nextTheme}`} onClick={() => setTheme(nextTheme)} size="icon" variant="ghost">
+    <Button aria-label={`Colour theme: ${theme}. Switch to ${nextTheme}`} title={`Switch colour theme to ${nextTheme}`} onClick={() => setTheme(nextTheme)} size="icon" variant="ghost">
       <Icon aria-hidden className="h-4 w-4" />
     </Button>
   );

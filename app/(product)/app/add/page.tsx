@@ -1,7 +1,9 @@
-import { Suspense } from 'react'
 import { AddItemForm } from '@/components/forms/add-item-form'
+import { getEntities } from '@/features/afterprice/queries'
 
-export default function AddPage() {
-  return <Suspense fallback={<div className="h-80 animate-pulse rounded-[20px] bg-[var(--surface-subtle)]" />}><AddItemForm /></Suspense>
+export const metadata = { title: 'Add item' }
+
+export default async function AddPage() {
+  const catalogue = await getEntities()
+  return <AddItemForm entities={catalogue.entities} suggestionLabel={catalogue.productLabel} />
 }
-

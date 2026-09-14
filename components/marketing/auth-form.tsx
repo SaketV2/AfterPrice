@@ -1,28 +1,42 @@
 'use client'
 
-/* eslint-disable @next/next/no-html-link-for-pages */
-
-import { FormEvent, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useActionState } from 'react'
+import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
+import { login, requestPasswordReset, signup, updatePassword, type AuthState } from '@/app/auth/actions'
 import { FormMessage, Wordmark } from './marketing-ui'
 
-export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+type Mode = 'login' | 'signup' | 'forgot' | 'reset'
+const initialState: AuthState = {}
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setError('')
-    if (mode === 'signup' && !name.trim()) { setError('Enter your name to continue.'); return }
-    if (!email.includes('@')) { setError('Enter a valid-looking email address.'); return }
-    if (password.length < 6) { setError('Use at least 6 characters for the demo password.'); return }
-    setLoading(true)
-    window.setTimeout(() => router.push('/app'), 300)
-  }
+export function AuthForm({ mode, next = '/app' }: { mode: Mode; next?: string }) {
+  const action = mode === 'login' ? login : mode === 'signup' ? signup : mode === 'forgot' ? requestPasswordReset : updatePassword
+  const [state, formAction, pending] = useActionState(action, initialState)
+  const title = { login: 'Open your change ledger.', signup: 'Make the change visible.', forgot: 'Reset your password.', reset: 'Choose a new password.' }[mode]
+  const description = { login: 'Sign in to view your saved baselines and current comparisons.', signup: 'Create your AfterPrice account. Your baselines stay private to you.', forgot: 'We’ll send a secure reset link if the address belongs to an account.', reset: 'Use at least 8 characters for your new password.' }[mode]
+  return (
+    <div className="w-full max-w-md rounded-2xl border border-[#d8dde5] bg-white p-6 sm:p-9">
+      <Link href="/" className="inline-flex min-h-11 items-center" aria-label="AfterPrice home"><Wordmark /></Link>
+      <h1 className="mt-8 font-[family-name:var(--font-display)] text-3xl font-bold leading-tight tracking-[-0.03em] sm:text-4xl">{title}</h1>
+      <p className="mt-4 text-sm leading-6 text-[#5d6673]">{description}</p>
+      <form action={formAction} className="mt-8 space-y-4">
+        <input type="hidden" name="next" value={next} />
+        {mode === 'signup' && <AuthField label="Name" name="name" autoComplete="name" placeholder="Your name" />}
+        {mode !== 'reset' && <AuthField label="Email" name="email" type="email" autoComplete="email" placeholder="name@example.com" />}
+        {(mode === 'login' || mode === 'signup' || mode === 'reset') && <AuthField label={mode === 'reset' ? 'New password' : 'Password'} name="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} placeholder="At least 8 characters" />}
+        {state.error && <FormMessage>{state.error}</FormMessage>}
+        {state.message && <p role="status" className="rounded-[12px] bg-[#e3f3e9] px-4 py-3 text-sm font-semibold leading-6 text-[#20744f]">{state.message}</p>}
+        <button type="submit" disabled={pending} className="flex min-h-12 w-full items-center justify-center rounded-[12px] bg-[#0c0f14] px-5 text-sm font-semibold text-white transition hover:bg-[#2a2f37] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#6875f5]/25 disabled:cursor-wait disabled:opacity-60">
+          {pending ? 'Please wait…' : mode === 'login' ? 'Log in' : mode === 'signup' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Update password'} <ArrowUpRight aria-hidden="true" size={17} className="ml-2" />
+        </button>
+      </form>
+      {mode === 'login' && <p className="mt-4 text-center text-sm"><Link href="/forgot-password" className="font-semibold text-[#3258d4] underline-offset-4 hover:underline">Forgot password?</Link></p>}
+      {(mode === 'login' || mode === 'signup') && <p className="mt-5 text-center text-sm text-[#5d6673]">{mode === 'login' ? 'Need an account?' : 'Already have an account?'} <Link href={mode === 'login' ? '/signup' : '/login'} className="font-semibold text-[#3258d4] underline-offset-4 hover:underline">{mode === 'login' ? 'Sign up' : 'Log in'}</Link></p>}
+      {mode === 'forgot' && <p className="mt-5 text-center text-sm"><Link href="/login" className="font-semibold text-[#3258d4] underline-offset-4 hover:underline">Back to login</Link></p>}
+    </div>
+  )
+}
 
-  return <div className="w-full max-w-md rounded-[28px] border border-[#e1e5ea] bg-white p-7 shadow-[0_12px_36px_rgba(12,15,20,.08)] sm:p-9"><a href="/" className="inline-flex"><Wordmark /></a><p className="mt-10 text-[11px] font-bold uppercase tracking-[.16em] text-[#6875f5]">{mode === 'login' ? 'Welcome back' : 'Start watching'}</p><h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl font-700 leading-tight tracking-[-.06em]">{mode === 'login' ? 'Open your watchtower.' : 'Make quiet cost changes visible.'}</h1><p className="mt-4 text-sm leading-6 text-[#5d6673]">{mode === 'login' ? 'Use any valid-looking details to enter the local demo.' : 'Create a demo account to explore SpendGuard with sample data.'}</p><form onSubmit={onSubmit} className="mt-8 space-y-4" noValidate>{mode === 'signup' && <label className="block"><span className="mb-2 block text-sm font-semibold text-[#3f4854]">Name</span><input value={name} onChange={event => setName(event.target.value)} autoComplete="name" className="min-h-12 w-full rounded-xl border border-[#d8dde5] bg-[#f6f6f3] px-4 text-sm text-[#0c0f14] outline-none transition placeholder:text-[#818b99] focus:border-[#6875f5] focus:ring-4 focus:ring-[#6875f5]/15" placeholder="Alex Morgan" /></label>}<label className="block"><span className="mb-2 block text-sm font-semibold text-[#3f4854]">Email</span><input value={email} onChange={event => setEmail(event.target.value)} type="email" autoComplete="email" className="min-h-12 w-full rounded-xl border border-[#d8dde5] bg-[#f6f6f3] px-4 text-sm text-[#0c0f14] outline-none transition placeholder:text-[#818b99] focus:border-[#6875f5] focus:ring-4 focus:ring-[#6875f5]/15" placeholder="name at domain" /></label><label className="block"><span className="mb-2 block text-sm font-semibold text-[#3f4854]">Password</span><input value={password} onChange={event => setPassword(event.target.value)} type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} className="min-h-12 w-full rounded-xl border border-[#d8dde5] bg-[#f6f6f3] px-4 text-sm text-[#0c0f14] outline-none transition placeholder:text-[#818b99] focus:border-[#6875f5] focus:ring-4 focus:ring-[#6875f5]/15" placeholder="At least 6 characters" /></label>{error && <FormMessage>{error}</FormMessage>}<button type="submit" disabled={loading} className="flex min-h-12 w-full items-center justify-center rounded-full bg-[#0c0f14] px-5 text-sm font-semibold text-white transition hover:bg-[#2a2f37] disabled:cursor-wait disabled:opacity-60">{loading ? 'Opening demo…' : mode === 'login' ? 'Log in to demo' : 'Create demo account'} <span className="ml-2" aria-hidden="true">↗</span></button></form><p className="mt-7 rounded-xl bg-[#f0f2f5] px-3 py-2.5 text-xs leading-5 text-[#5d6673]">Demo behaviour: no production authentication or payment is connected. Your details stay in this local flow.</p><p className="mt-6 text-center text-sm text-[#5d6673]">{mode === 'login' ? 'Need an account?' : 'Already have an account?'} <a href={mode === 'login' ? '/signup' : '/login'} className="font-semibold text-[#5967e8] hover:underline">{mode === 'login' ? 'Sign up' : 'Log in'}</a></p></div>
+function AuthField({ label, name, type = 'text', autoComplete, placeholder }: { label: string; name: string; type?: string; autoComplete: string; placeholder: string }) {
+  return <label className="block"><span className="mb-2 block text-sm font-semibold text-[#3f4854]">{label}</span><input name={name} type={type} autoComplete={autoComplete} required className="min-h-12 w-full rounded-[12px] border border-[#cfd5dd] bg-[#f6f6f3] px-4 text-sm text-[#0c0f14] outline-none transition placeholder:text-[#68717e] focus:border-[#6875f5] focus:ring-4 focus:ring-[#6875f5]/15" placeholder={placeholder} /></label>
 }

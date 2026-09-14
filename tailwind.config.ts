@@ -17,18 +17,18 @@ const config: Config = {
     },
     extend: {
       colors: {
-        background: "hsl(var(--background) / <alpha-value>)",
-        foreground: "hsl(var(--foreground) / <alpha-value>)",
-        surface: "hsl(var(--surface) / <alpha-value>)",
-        border: "hsl(var(--border) / <alpha-value>)",
-        accent: "hsl(var(--accent) / <alpha-value>)",
+        background: "hsl(var(--semantic-background, var(--background)) / <alpha-value>)",
+        foreground: "hsl(var(--semantic-foreground, var(--foreground)) / <alpha-value>)",
+        surface: "hsl(var(--semantic-surface, var(--surface)) / <alpha-value>)",
+        border: "hsl(var(--semantic-border, var(--border)) / <alpha-value>)",
+        accent: "hsl(var(--semantic-accent, var(--accent)) / <alpha-value>)",
         muted: {
-          DEFAULT: "hsl(var(--surface-subtle) / <alpha-value>)",
-          foreground: "hsl(var(--foreground-secondary) / <alpha-value>)",
+          DEFAULT: "hsl(var(--semantic-surface-subtle, var(--surface-subtle)) / <alpha-value>)",
+          foreground: "hsl(var(--semantic-foreground-secondary, var(--foreground-secondary)) / <alpha-value>)",
         },
         destructive: {
-          DEFAULT: "hsl(var(--danger) / <alpha-value>)",
-          foreground: "hsl(var(--surface) / <alpha-value>)",
+          DEFAULT: "hsl(var(--semantic-danger, var(--danger)) / <alpha-value>)",
+          foreground: "hsl(var(--semantic-surface, var(--surface)) / <alpha-value>)",
         },
       },
       fontFamily: {

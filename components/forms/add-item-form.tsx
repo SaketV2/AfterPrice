@@ -1,77 +1,108 @@
 'use client'
 
-import { useRef, useState, type FormEvent } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useSpendGuardStore } from '@/lib/store/use-spendguard-store'
+import { useActionState, useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Check, CircleHelp, PackageSearch, Search, ShoppingBag, WalletCards } from 'lucide-react'
+import { createBaseline, type BaselineState } from '@/features/baselines/actions'
+import type { Entity } from '@/features/afterprice/types'
 import { PageIntro, Panel, StatusBadge } from '@/components/dashboard/product-ui'
-import type { BillingCycle } from '@/lib/types'
 
-type FormMode = 'purchase' | 'subscription'
+type ItemType = 'purchase' | 'subscription'
+const initialState: BaselineState = {}
+const inputClass = 'mt-2 h-12 w-full rounded-input border border-border bg-background px-3.5 text-sm text-foreground outline-none transition placeholder:text-[hsl(var(--foreground-muted))] focus:border-accent focus:ring-2 focus:ring-[hsl(var(--accent-soft))]'
 
-const inputClass = 'mt-2 h-12 w-full rounded-xl border border-[var(--border)] bg-white px-3.5 text-sm outline-none transition placeholder:text-[var(--foreground-muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]'
-
-function Field({ label, name, type = 'text', value, onChange, placeholder, required = true, min }: { label: string; name: string; type?: string; value: string; onChange: (value: string) => void; placeholder?: string; required?: boolean; min?: string }) {
-  return <label className="block text-sm font-bold text-[var(--foreground)]">{label}{required && <span className="ml-1 text-[var(--danger)]">*</span>}<input name={name} type={type} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} required={required} min={min} step={type === 'number' ? '0.01' : undefined} className={inputClass} /></label>
+function normalise(value: string) {
+  return value.toLowerCase().replace(/[\s\-_]+/g, '')
 }
 
-export function AddItemForm() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const { addPurchase, addSubscription, addDocument } = useSpendGuardStore()
-  const [mode, setMode] = useState<FormMode>(searchParams.get('type') === 'subscription' ? 'subscription' : 'purchase')
-  const [product, setProduct] = useState('')
-  const [retailer, setRetailer] = useState('')
-  const [amount, setAmount] = useState('')
-  const [purchaseDate, setPurchaseDate] = useState('')
-  const [url, setUrl] = useState('')
-  const [orderNumber, setOrderNumber] = useState('')
-  const [service, setService] = useState('')
-  const [plan, setPlan] = useState('')
-  const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly')
-  const [renewalDate, setRenewalDate] = useState('')
-  const [planUrl, setPlanUrl] = useState('')
-  const [error, setError] = useState('')
-  const [saved, setSaved] = useState(false)
-  const [receipt, setReceipt] = useState<{ name: string; parsed: boolean } | null>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
+function Field({ label, name, type = 'text', value, onChange, placeholder, optional = false, min, step }: { label: string; name: string; type?: string; value: string; onChange: (value: string) => void; placeholder?: string; optional?: boolean; min?: string; step?: string }) {
+  return <label htmlFor={name} className="block min-w-0 text-sm font-semibold">{label}{optional && <span className="ml-1 font-normal text-[hsl(var(--foreground-secondary))]">(optional)</span>}<input id={name} name={name} type={type} value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder} required={!optional} min={min} step={step} className={inputClass} /></label>
+}
 
-  const resetStatus = () => { setError(''); setSaved(false) }
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); resetStatus()
-    const numericAmount = Number(amount)
-    if (!numericAmount || numericAmount <= 0) { setError('Enter an amount greater than $0.'); return }
-    if (mode === 'purchase') {
-      if (!product.trim() || !retailer.trim() || !purchaseDate) { setError('Complete the product, retailer and purchase date fields.'); return }
-      addPurchase({ product: product.trim(), retailer: retailer.trim(), amount: numericAmount, purchaseDate, url: url.trim() || undefined, orderNumber: orderNumber.trim() || undefined })
-    } else {
-      if (!service.trim() || !plan.trim() || !renewalDate) { setError('Complete the service, plan and renewal date fields.'); return }
-      addSubscription({ service: service.trim(), plan: plan.trim(), price: numericAmount, billingCycle, renewalDate, planUrl: planUrl.trim() || undefined })
-    }
-    setSaved(true)
-    window.setTimeout(() => router.push('/app'), 600)
+export function AddItemForm({ entities, suggestionLabel }: { entities: Entity[]; suggestionLabel: string }) {
+  const searchParams = useSearchParams()
+  const [state, action, pending] = useActionState(createBaseline, initialState)
+  const [type, setType] = useState<ItemType>(searchParams.get('type') === 'subscription' ? 'subscription' : 'purchase')
+  const [query, setQuery] = useState('')
+  const [selectedId, setSelectedId] = useState('')
+  const [remoteEntities, setRemoteEntities] = useState<Entity[]>([])
+  const [remoteSearchKey, setRemoteSearchKey] = useState('')
+  const [searchingKey, setSearchingKey] = useState('')
+  const searchTerm = query.trim()
+  const searchKey = `${type}:${searchTerm}`
+  const searching = searchingKey === searchKey
+  const allEntities = useMemo(() => {
+    const visibleRemoteEntities = remoteSearchKey === searchKey ? remoteEntities : []
+    return [...entities, ...visibleRemoteEntities.filter(remote => !entities.some(entity => entity.id === remote.id))]
+  }, [entities, remoteEntities, remoteSearchKey, searchKey])
+  const selected = useMemo(() => allEntities.find(entity => entity.id === selectedId), [allEntities, selectedId])
+  const options = useMemo(() => allEntities.filter(entity => entity.entity_type === (type === 'purchase' ? 'retail_product' : 'subscription')).filter(entity => {
+    const text = normalise(`${entity.display_name} ${entity.provider} ${entity.brand ?? ''} ${entity.variant ?? ''}`)
+    return !query.trim() || text.includes(normalise(query))
+  }).slice(0, 8), [allEntities, query, type])
+  const [provider, setProvider] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [brand, setBrand] = useState('')
+  const [variant, setVariant] = useState('')
+  const [sizeLabel, setSizeLabel] = useState('')
+  const [amount, setAmount] = useState('')
+  const [capturedAt, setCapturedAt] = useState('')
+  const [planName, setPlanName] = useState('')
+  const [billingInterval, setBillingInterval] = useState('monthly')
+  const [renewalAt, setRenewalAt] = useState('')
+  const [returnDeadline, setReturnDeadline] = useState('')
+  const [returnDeadlineSource, setReturnDeadlineSource] = useState('unknown')
+  const [sourceUrl, setSourceUrl] = useState('')
+
+  useEffect(() => {
+    if (type !== 'purchase' || searchTerm.length < 2) return
+    const controller = new AbortController()
+    const timer = window.setTimeout(async () => {
+      setSearchingKey(searchKey)
+      try {
+        const response = await fetch(`/api/catalogue/search?q=${encodeURIComponent(searchTerm)}&limit=8`, { signal: controller.signal })
+        if (!response.ok) return
+        const result = await response.json() as { products?: Array<{ catalogProductId?: string; canonicalKey: string; displayName: string; brand?: string; modelNumber?: string; category?: string }> }
+        setRemoteEntities((result.products ?? []).flatMap(product => product.catalogProductId ? [{ id: product.catalogProductId, entity_type: 'retail_product' as const, provider: product.brand ?? 'Catalogue', external_id: product.canonicalKey, display_name: product.displayName, brand: product.brand ?? null, variant: product.modelNumber ?? null, size_label: null, category: product.category ?? null, source_url: null, metadata: {}, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }] : []))
+        setRemoteSearchKey(searchKey)
+      } catch {
+        if (!controller.signal.aborted) setRemoteEntities([])
+      } finally {
+        if (!controller.signal.aborted) setSearchingKey(current => current === searchKey ? '' : current)
+      }
+    }, 220)
+    return () => { controller.abort(); window.clearTimeout(timer) }
+  }, [searchKey, searchTerm, type])
+
+  function chooseType(next: ItemType) {
+    setType(next); setQuery(''); setSelectedId(''); setProvider(''); setDisplayName(''); setBrand(''); setVariant(''); setSizeLabel(''); setPlanName(''); setBillingInterval('monthly'); setRenewalAt(''); setReturnDeadline(''); setReturnDeadlineSource('unknown')
   }
 
-  const uploadReceipt = (file: File | undefined) => {
-    if (!file) return
-    const supported = ['application/pdf', 'image/png', 'image/jpeg']
-    if (!supported.includes(file.type)) { setError('Use a PDF, PNG or JPG receipt for the demo parser.'); return }
-    setError(''); setReceipt({ name: file.name, parsed: false })
-    addDocument({
-      id: `document-${Date.now()}`,
-      name: file.name,
-      type: 'receipt',
-      size: `${Math.max(1, Math.round(file.size / 1024))} KB`,
-      uploadedAt: new Date().toISOString(),
-      status: 'ready',
-    })
-    window.setTimeout(() => { setReceipt({ name: file.name, parsed: true }); setProduct('Sony WH-1000XM6'); setRetailer('Amazon'); setAmount('349'); setPurchaseDate('2026-08-20'); setOrderNumber('SG-081240') }, 500)
+  function chooseEntity(entity: Entity) {
+    setSelectedId(entity.id); setProvider(entity.provider); setDisplayName(entity.display_name); setBrand(entity.brand ?? ''); setVariant(entity.variant ?? ''); setSizeLabel(entity.size_label ?? '')
+    if (type === 'subscription') setPlanName(entity.variant ?? '')
   }
 
   return <>
-    <PageIntro eyebrow="Add to your monitor" title="Watch something new" description="Add a purchase or subscription manually, or upload a demo receipt to pre-fill the details." />
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-      <Panel><div className="mb-6 flex rounded-xl bg-[var(--surface-subtle)] p-1"><button type="button" onClick={() => { setMode('purchase'); resetStatus() }} className={`flex-1 rounded-lg py-3 text-sm font-bold transition ${mode === 'purchase' ? 'bg-white text-[var(--foreground)] shadow-sm' : 'text-[var(--foreground-secondary)]'}`}>Add purchase</button><button type="button" onClick={() => { setMode('subscription'); resetStatus() }} className={`flex-1 rounded-lg py-3 text-sm font-bold transition ${mode === 'subscription' ? 'bg-white text-[var(--foreground)] shadow-sm' : 'text-[var(--foreground-secondary)]'}`}>Add subscription</button></div><form onSubmit={submit} noValidate className="space-y-5">{mode === 'purchase' ? <div className="grid gap-5 sm:grid-cols-2"><Field label="What did you buy?" name="product" value={product} onChange={setProduct} placeholder="Sony WH-1000XM6" /><Field label="Retailer" name="retailer" value={retailer} onChange={setRetailer} placeholder="Amazon" /><Field label="Amount paid" name="amount" type="number" value={amount} onChange={setAmount} placeholder="349" min="0.01" /><Field label="Purchase date" name="purchaseDate" type="date" value={purchaseDate} onChange={setPurchaseDate} /><Field label="Product URL" name="url" value={url} onChange={setUrl} placeholder="https://retailer.example/item" required={false} /><Field label="Order number" name="orderNumber" value={orderNumber} onChange={setOrderNumber} placeholder="Optional" required={false} /></div> : <div className="grid gap-5 sm:grid-cols-2"><Field label="Service" name="service" value={service} onChange={setService} placeholder="Notion" /><Field label="Plan" name="plan" value={plan} onChange={setPlan} placeholder="Plus" /><Field label="Price" name="price" type="number" value={amount} onChange={setAmount} placeholder="18" min="0.01" /><label className="block text-sm font-bold">Billing cycle<span className="ml-1 text-[var(--danger)]">*</span><select value={billingCycle} onChange={(event) => setBillingCycle(event.target.value as BillingCycle)} className={inputClass}><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="annual">Annual</option></select></label><Field label="Next renewal" name="renewalDate" type="date" value={renewalDate} onChange={setRenewalDate} /><Field label="Plan URL" name="planUrl" value={planUrl} onChange={setPlanUrl} placeholder="https://service.example/plans" required={false} /></div>}{error && <p role="alert" className="rounded-xl bg-[var(--danger-soft)] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</p>}{saved && <p role="status" className="rounded-xl bg-[var(--success-soft)] px-4 py-3 text-sm font-semibold text-[var(--success)]">Added. Taking you to your overview…</p>}<div className="flex flex-col-reverse justify-end gap-3 border-t border-[var(--border)] pt-5 sm:flex-row"><button type="button" onClick={() => router.back()} className="min-h-11 rounded-xl border border-[var(--border)] px-5 text-sm font-bold hover:bg-[var(--surface-subtle)]">Cancel</button><button type="submit" className="min-h-11 rounded-xl bg-[var(--accent)] px-5 text-sm font-bold text-white hover:bg-[var(--accent-hover)]">Start watching</button></div></form></Panel>
-      <div className="space-y-5"><Panel><p className="font-display text-lg font-extrabold">Upload a receipt</p><p className="mt-2 text-sm leading-6 text-[var(--foreground-secondary)]">The demo parser accepts a PDF, PNG or JPG and fills a few example fields for you to check.</p><button type="button" onClick={() => fileRef.current?.click()} className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl border border-dashed border-[var(--accent)] bg-[var(--accent-soft)] px-4 text-sm font-bold text-[var(--accent)] hover:bg-[#dde1ff]">Choose receipt</button><input ref={fileRef} type="file" accept=".pdf,.png,.jpg,.jpeg" className="sr-only" onChange={(event) => uploadReceipt(event.target.files?.[0])} />{receipt && <div className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3"><div className="flex items-center justify-between gap-3"><span className="truncate text-sm font-semibold">{receipt.name}</span><StatusBadge tone={receipt.parsed ? 'success' : 'accent'}>{receipt.parsed ? 'Parsed' : 'Reading'}</StatusBadge></div>{receipt.parsed && <p className="mt-2 text-xs leading-5 text-[var(--foreground-secondary)]">Fields were added to the purchase form. Review them before saving.</p>}</div>}</Panel><Panel className="bg-[var(--surface-dark)] text-white"><p className="font-display text-lg font-extrabold">Forward a receipt</p><p className="mt-2 text-sm leading-6 text-white/70">In V1 this is a demo address only. It is not provisioned for real email forwarding.</p><p className="mt-4 rounded-xl bg-white/10 px-3 py-3 text-center text-sm font-bold text-[var(--powder)]">yourname at in.spendguard.app</p></Panel></div>
+    <PageIntro title="Add an item to monitor." description="Choose a known product or service when possible, then add only the details that belong to your purchase or subscription." />
+    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <Panel className="min-w-0">
+        <div role="group" aria-label="Item type" className="mb-7 grid grid-cols-2 gap-1 rounded-input bg-[hsl(var(--surface-subtle))] p-1"><button type="button" aria-pressed={type === 'purchase'} onClick={() => chooseType('purchase')} className={`flex min-h-12 items-center justify-center gap-2 rounded-input text-sm font-bold transition-colors ${type === 'purchase' ? 'bg-surface text-foreground shadow-sm' : 'text-[hsl(var(--foreground-secondary))] hover:text-foreground'}`}><ShoppingBag className="h-4 w-4" />Purchase</button><button type="button" aria-pressed={type === 'subscription'} onClick={() => chooseType('subscription')} className={`flex min-h-12 items-center justify-center gap-2 rounded-input text-sm font-bold transition-colors ${type === 'subscription' ? 'bg-surface text-foreground shadow-sm' : 'text-[hsl(var(--foreground-secondary))] hover:text-foreground'}`}><WalletCards className="h-4 w-4" />Subscription</button></div>
+        <div className="border-b border-border pb-6"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-display text-xl font-extrabold">{type === 'purchase' ? 'Find the product' : 'Find the service'}</h3><p className="mt-1 text-sm leading-6 text-[hsl(var(--foreground-secondary))]">Search the shared catalogue first. A match keeps identity details consistent for later observations.</p></div>{selected && <StatusBadge tone="success">Catalogue match</StatusBadge>}</div><label htmlFor="catalogue-search" className="relative mt-5 block"><span className="sr-only">Search catalogue</span><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(var(--foreground-muted))]" /><input id="catalogue-search" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={type === 'purchase' ? 'Search products, brands or model numbers' : 'Search services'} className={`${inputClass} pl-10`} /></label><p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-[hsl(var(--foreground-muted))]">{query.trim() ? 'Search results' : type === 'purchase' ? suggestionLabel : 'Recognised services'}</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{options.length ? options.map(entity => <button type="button" key={entity.id} onClick={() => chooseEntity(entity)} className={`flex min-h-16 items-start gap-3 rounded-input border p-3 text-left transition-colors ${selectedId === entity.id ? 'border-accent bg-[hsl(var(--accent-soft))]' : 'border-border hover:bg-[hsl(var(--surface-subtle))]'}`}><span className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg ${selectedId === entity.id ? 'bg-accent text-white' : 'bg-[hsl(var(--surface-subtle))] text-accent'}`}>{selectedId === entity.id ? <Check className="h-4 w-4" /> : <PackageSearch className="h-4 w-4" />}</span><span className="min-w-0"><span className="block truncate text-sm font-bold">{entity.display_name}</span><span className="mt-1 block truncate text-xs text-[hsl(var(--foreground-secondary))]">{entity.provider}{entity.brand ? ` · ${entity.brand}` : ''}{entity.variant ? ` · ${entity.variant}` : ''}</span></span></button>) : <div className="col-span-full rounded-input border border-dashed border-border px-4 py-4 text-sm text-[hsl(var(--foreground-secondary))]">{searching ? 'Searching the catalogue…' : 'No local matches for this search. Continue with a manual item below.'}</div>}</div><p className="mt-4 text-xs leading-5 text-[hsl(var(--foreground-secondary))]">Can&apos;t find your {type === 'purchase' ? 'product' : 'service'}? Leave the catalogue selection blank and add it manually. Manual items begin with limited or manual monitoring.</p></div>
+        <form action={action} className="space-y-6 pt-6"><input type="hidden" name="baseline_type" value={type} /><input type="hidden" name="entity_id" value={selectedId} />
+          <div><h3 className="font-display text-xl font-extrabold">{type === 'purchase' ? 'Purchase details' : 'Subscription details'}</h3><p className="mt-1 text-sm leading-6 text-[hsl(var(--foreground-secondary))]">These fields describe your own record. Amounts are stored in AUD.</p></div>
+          <div className="grid gap-5 sm:grid-cols-2"><Field label={type === 'purchase' ? 'Purchased from' : 'Provider'} name="provider" value={provider} onChange={setProvider} placeholder={type === 'purchase' ? 'e.g. Sony Store' : 'e.g. Spotify'} /><Field label={type === 'purchase' ? 'Product name' : 'Service name'} name="display_name" value={displayName} onChange={setDisplayName} placeholder={type === 'purchase' ? 'e.g. WH-1000XM6' : 'e.g. Spotify'} />{type === 'purchase' ? <><Field label="Brand" name="brand" value={brand} onChange={setBrand} placeholder="e.g. Sony" optional /><Field label="Variant or model" name="variant" value={variant} onChange={setVariant} placeholder="e.g. WH-1000XM6" optional /><Field label="Pack size" name="size_label" value={sizeLabel} onChange={setSizeLabel} placeholder="e.g. 1 item" optional /></> : <Field label="Plan name" name="plan_name" value={planName} onChange={setPlanName} placeholder="e.g. Premium" optional />}</div>
+          <div className="grid gap-5 border-t border-border pt-5 sm:grid-cols-2"><Field label={type === 'purchase' ? 'Amount paid (AUD)' : 'Price per billing cycle (AUD)'} name="amount" type="number" value={amount} onChange={setAmount} placeholder="0.00" min="0" step="0.01" /><Field label={type === 'purchase' ? 'Purchase date' : 'Baseline date'} name="captured_at" type="date" value={capturedAt} onChange={setCapturedAt} />{type === 'subscription' && <label htmlFor="billing_interval" className="block text-sm font-semibold">Billing interval<select id="billing_interval" name="billing_interval" value={billingInterval} onChange={event => setBillingInterval(event.target.value)} className={inputClass}><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="annual">Annual</option><option value="one_off">One-off</option></select></label>}{type === 'subscription' && <Field label="Next renewal date" name="renewal_at" type="date" value={renewalAt} onChange={setRenewalAt} optional />}{type === 'purchase' && <Field label="Return deadline" name="return_deadline" type="date" value={returnDeadline} onChange={setReturnDeadline} optional />}{type === 'purchase' && <label htmlFor="return_deadline_source" className="block text-sm font-semibold">Deadline confidence<select id="return_deadline_source" name="return_deadline_source" value={returnDeadlineSource} onChange={event => setReturnDeadlineSource(event.target.value)} className={inputClass}><option value="unknown">Unknown</option><option value="user_confirmed">I confirmed it</option><option value="retailer_policy">Retailer policy</option><option value="estimated">Estimated</option></select></label>}</div>
+          <div className="border-t border-border pt-5"><Field label="Original source URL" name="source_url" type="url" value={sourceUrl} onChange={setSourceUrl} placeholder="https://…" optional /></div>
+          {state.error && <p role="alert" className="rounded-input bg-[hsl(var(--danger-soft))] px-4 py-3 text-sm font-semibold leading-6 text-[hsl(var(--danger))]">{state.error}</p>}
+          <div className="flex justify-end border-t border-border pt-5"><button type="submit" disabled={pending} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-input bg-accent px-5 text-sm font-bold text-white transition-colors hover:bg-[hsl(var(--accent-hover))] disabled:cursor-wait disabled:opacity-60">{pending ? 'Saving…' : 'Save item'}<ArrowIcon /></button></div>
+        </form>
+      </Panel>
+      <aside className="space-y-5"><Panel><div className="flex items-start gap-3"><CircleHelp className="mt-0.5 h-5 w-5 shrink-0 text-accent" /><div><h3 className="font-display text-lg font-extrabold">What gets monitored</h3><p className="mt-2 text-sm leading-6 text-[hsl(var(--foreground-secondary))]">AfterPrice stores your baseline separately from later observations. It will only call a change actionable when the identity and source support that comparison.</p></div></div><div className="mt-5 space-y-3 border-t border-border pt-5 text-sm"><div><p className="font-bold">Known catalogue match</p><p className="mt-1 leading-5 text-[hsl(var(--foreground-secondary))]">Canonical identity is saved with the record.</p></div><div><p className="font-bold">Manual item</p><p className="mt-1 leading-5 text-[hsl(var(--foreground-secondary))]">The record is saved, but monitoring capability depends on a supported source.</p></div></div></Panel><div className="rounded-dashboard bg-[hsl(var(--surface-dark))] p-5 text-white"><p className="font-display text-lg font-extrabold">Your original record stays fixed.</p><p className="mt-2 text-sm leading-6 text-white/75">Later prices, plans and renewal notices are stored as separate observations so you can see exactly what changed.</p></div></aside>
     </div>
   </>
+}
+
+function ArrowIcon() {
+  return <span aria-hidden="true">→</span>
 }
