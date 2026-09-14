@@ -1,3 +1,0 @@
--- AfterPrice has no seeded user purchases, subscriptions, alerts or prices.
--- The reengineering migration bootstraps only shared catalogue identities and
--- service identities. New authenticated accounts start with empty private data.
