@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Instrument_Serif } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider, type Theme } from "@/lib/theme";
@@ -10,6 +11,13 @@ const instrumentSans = localFont({
   display: "swap",
   weight: "400 700",
   fallback: ["Segoe UI", "Arial", "sans-serif"],
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument-serif",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -46,7 +54,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     if (preferences?.theme === "light" || preferences?.theme === "dark" || preferences?.theme === "system") defaultTheme = preferences.theme;
   }
   return (
-    <html lang="en-AU" className={instrumentSans.variable} suppressHydrationWarning>
+    <html lang="en-AU" className={`${instrumentSans.variable} ${instrumentSerif.variable}`} suppressHydrationWarning>
       <body>
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <div aria-hidden="true" hidden dangerouslySetInnerHTML={{ __html: designContract }} />

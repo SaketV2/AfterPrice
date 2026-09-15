@@ -9,17 +9,15 @@ type BrandMarkProps = {
 
 export function BrandMark({ className, title = "AfterPrice", decorative = false }: BrandMarkProps) {
   return (
-    <svg aria-hidden={decorative} aria-label={decorative ? undefined : title} className={cn("h-9 w-9", className)} fill="none" focusable="false" role={decorative ? undefined : "img"} viewBox="0 0 40 40">
-      <path d="M20 3.75a16.25 16.25 0 1 0 12.95 26.08" stroke="hsl(var(--cobalt))" strokeLinecap="round" strokeWidth="3.25" />
-      <path d="M32.95 16.15v14.2H18.7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.25" />
-      <path d="m12.6 19.7 5.1 5.15 8.65-10.2" stroke="hsl(var(--signal-lime-ink))" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.25" />
-      <circle cx="32.95" cy="16.15" fill="hsl(var(--signal-lime-ink))" r="2.3" />
+    <svg aria-hidden={decorative} aria-label={decorative ? undefined : title} className={cn("h-9 w-9", className)} fill="none" focusable="false" role={decorative ? undefined : "img"} viewBox="0 0 36 36">
+      <path d="M7 29 20 7" stroke="currentColor" strokeLinecap="round" strokeWidth="8" />
+      <path d="m19 29 10-16" stroke="currentColor" strokeLinecap="round" strokeWidth="8" />
     </svg>
   );
 }
 
 export function Wordmark({ className }: { className?: string }) {
-  return <span className={cn("font-display text-lg font-extrabold tracking-[-0.045em]", className)}>AfterPrice</span>;
+  return <span className={cn("font-editorial text-[1.45rem] leading-none tracking-[-0.045em]", className)}>AfterPrice</span>;
 }
 
 export function Logo({ href = "/", className, label = true }: { href?: string; className?: string; label?: boolean }) {

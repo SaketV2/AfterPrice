@@ -105,6 +105,14 @@ export const lifecycleSteps = [
     tone: 'baseline',
   },
   {
+    name: 'Observe',
+    title: 'Keep the later signal beside the record.',
+    description: 'An observation adds a source and time to the record, whether the source is supported or the check is still manual.',
+    value: '06 Sep',
+    subvalue: 'Sony Store · source available',
+    tone: 'observe',
+  },
+  {
     name: 'Change',
     title: 'See the difference, not just an alert.',
     description: 'AfterPrice puts the original value beside the latest observed value so the change has context.',

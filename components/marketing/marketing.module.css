@@ -37,7 +37,6 @@
   stroke-linecap: round;
   stroke-dasharray: 10 12;
   opacity: 0.82;
-  animation: rail-drift 14s linear infinite;
 }
 
 .railTrackShadow {
@@ -248,11 +247,6 @@
   background: #e1f3ea;
 }
 
-@keyframes rail-drift {
-  to { stroke-dashoffset: -220; }
-}
-
-
 @media (max-width: 1023px) {
   .timelineStage {
     position: relative;
@@ -261,6 +255,25 @@
 }
 
 @media (max-width: 479px) {
+  .heroRecordStage {
+    min-height: 650px;
+    padding: 2.5rem 0.25rem 2.25rem 0.75rem;
+  }
+
+  .heroPaper {
+    inset: 1rem 10% 4.5rem 0;
+  }
+
+  .heroReceipt {
+    right: -0.5rem;
+    bottom: 2rem;
+    width: 27%;
+  }
+
+  .heroRecord {
+    padding: 1rem;
+  }
+
   .railMap {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
@@ -310,6 +323,224 @@
   .timelineStep,
   .timelineStagePanel,
   .timelineStageContent {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* AfterPrice marketing world: a warm, annotated paper system around a dark evidence instrument. */
+.marketingRoot {
+  --marketing-paper: #f3efe7;
+  --marketing-white: #fbfaf7;
+  --marketing-ink: #101820;
+  --marketing-muted: #5d6673;
+  --marketing-rule: #d5d1c8;
+  --marketing-cobalt: #4256c7;
+  --marketing-sage: #bfd379;
+  background: var(--marketing-paper);
+  color: var(--marketing-ink);
+}
+
+.header {
+  background: rgba(243, 239, 231, 0.86);
+}
+
+.headerScrolled {
+  background: rgba(251, 250, 247, 0.96);
+  border-bottom-color: var(--marketing-rule);
+  box-shadow: 0 8px 24px rgba(16, 24, 32, 0.06);
+}
+
+.heroSection {
+  position: relative;
+  overflow: hidden;
+  background: var(--marketing-paper);
+}
+
+.heroSection::after {
+  position: absolute;
+  right: 3rem;
+  bottom: -8rem;
+  width: 15rem;
+  height: 15rem;
+  border: 1px solid rgba(16, 24, 32, 0.12);
+  border-radius: 50%;
+  content: '';
+}
+
+.heroCopy,
+.heroRail {
+  position: relative;
+  z-index: 1;
+}
+
+.heroRecordStage {
+  position: relative;
+  min-height: 560px;
+  padding: 2.5rem 1.25rem 2.5rem 2rem;
+}
+
+.heroPaper,
+.heroReceipt {
+  position: absolute;
+  border: 1px solid #cfd5dd;
+  box-shadow: 0 16px 30px rgba(12, 15, 20, 0.08);
+}
+
+.heroPaper {
+  inset: 1.5rem 14% 3.5rem 3%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 2rem 1.5rem;
+  background: #d7d4ca;
+  color: #394149;
+  transform: rotate(-5deg);
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.heroReceipt {
+  right: 1%;
+  bottom: 2.5rem;
+  width: 30%;
+  min-height: 270px;
+  padding: 1.5rem 1rem;
+  background: #eeece5;
+  color: #0c0f14;
+  transform: rotate(5deg);
+}
+
+.heroReceipt span,
+.heroReceipt small {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+}
+
+.heroReceipt strong {
+  display: block;
+  margin-top: 2rem;
+  font-family: var(--font-display);
+  font-size: 2rem;
+}
+
+.heroReceipt small {
+  margin-top: 1rem;
+  color: #55616c;
+}
+
+.heroRecord {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 560px);
+  margin-left: auto;
+  border: 1px solid #dce2e6;
+  border-radius: 20px;
+  background: #ffffff;
+  padding: 1.25rem;
+  box-shadow: 0 22px 44px rgba(12, 15, 20, 0.14);
+}
+
+.heroStamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--marketing-rule);
+  padding-bottom: 0.75rem;
+  color: var(--marketing-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.heroStamp::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--marketing-sage);
+  content: '';
+}
+
+.sectionWarm { background: var(--marketing-paper); }
+.sectionWhite { background: var(--marketing-white); }
+.sectionDark { background: #111b27; }
+.sectionRule { border-color: var(--marketing-rule); }
+
+.sectionTitle {
+  max-width: 15ch;
+  font-size: clamp(2rem, 4vw, 4.25rem);
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.sectionLead {
+  max-width: 42rem;
+  color: var(--marketing-muted);
+  font-size: clamp(1rem, 1.5vw, 1.22rem);
+  line-height: 1.75;
+}
+
+.ruleList {
+  border-top: 1px solid var(--marketing-rule);
+  border-bottom: 1px solid var(--marketing-rule);
+}
+
+.ruleList > * + * { border-top: 1px solid var(--marketing-rule); }
+
+.recordSurface {
+  border: 1px solid var(--marketing-rule);
+  border-radius: 1.25rem;
+  background: var(--marketing-white);
+  box-shadow: 0 16px 38px rgba(16, 24, 32, 0.08);
+}
+
+.authFrame {
+  background: var(--marketing-paper);
+}
+
+.authCard {
+  border: 1px solid #cfcac0;
+  border-radius: 1.25rem;
+  background: var(--marketing-white);
+  box-shadow: 0 16px 38px rgba(16, 24, 32, 0.08);
+}
+
+.legalPage { background: var(--marketing-white); }
+
+.legalRule {
+  border-top: 1px solid var(--marketing-rule);
+  border-bottom: 1px solid var(--marketing-rule);
+}
+
+.reveal {
+  animation: marketing-rise 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes marketing-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 767px) {
+  .heroSection::after { right: -5rem; bottom: -7rem; }
+  .sectionTitle { max-width: 17ch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .railNode,
+  .railTrack,
+  .feedRecord,
+  .timelineMarker,
+  .feedDetail,
+  .timelineStep,
+  .timelineStagePanel,
+  .timelineStageContent,
+  .reveal {
     animation: none;
     transition: none;
   }

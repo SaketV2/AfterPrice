@@ -18,7 +18,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   const markClass = resource.accent === 'amber' ? styles.resourceMarkAmber : resource.accent === 'green' ? styles.resourceMarkGreen : ''
 
   return (
-    <main>
+    <main id="main-content" tabIndex={-1}>
       <article>
         <header className="px-5 pb-16 pt-16 sm:px-8 sm:pb-24 sm:pt-24 lg:px-10"><div className="mx-auto max-w-3xl"><p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#5967e8]">{resource.category} · {resource.readTime}</p><h1 className="mt-6 font-[family-name:var(--font-display)] text-5xl font-750 leading-[0.96] tracking-[-0.065em] sm:text-7xl">{resource.title}</h1><p className="mt-7 max-w-2xl text-lg leading-8 text-[#5d6673]">{resource.excerpt}</p><p className="mt-6 text-xs text-[#68717e]">Published {resource.date}</p></div></header>
         <div className={[styles.resourceMark, markClass, 'mx-5 flex h-56 items-end p-6 sm:mx-8 sm:h-72 sm:p-10 lg:mx-auto lg:max-w-[1280px]'].join(' ')}><span className="relative z-10 max-w-xl font-[family-name:var(--font-display)] text-3xl font-700 tracking-[-0.05em] text-[#0c0f14] sm:text-5xl">A closer look at the baseline.</span></div>

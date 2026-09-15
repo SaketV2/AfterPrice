@@ -1,23 +1,26 @@
 import { ArrowUpRightIcon, ButtonLink, FaqAccordion } from '@/components/marketing/marketing-ui'
-import { ChangeRail, LiveChangeFeed, Lifecycle } from '@/components/marketing/product-preview'
+import { HeroPurchaseRecord, LiveChangeFeed, Lifecycle } from '@/components/marketing/product-preview'
 import { capabilityRows, changeTypes, coverageItems, faqItems } from '@/components/marketing/marketing-data'
+import styles from '@/components/marketing/marketing.module.css'
 
 export default function HomePage() {
   return (
-    <main>
-      <section className="px-5 pb-16 pt-10 sm:px-8 sm:pb-20 sm:pt-14 lg:px-10 lg:pb-24 lg:pt-16">
+    <main id="main-content" tabIndex={-1}>
+      <section className={[styles.heroSection, 'px-5 pb-16 pt-10 sm:px-8 sm:pb-20 sm:pt-14 lg:px-10 lg:pb-24 lg:pt-16'].join(' ')}>
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
-          <div className="min-w-0">
+          <div className={[styles.heroCopy, 'min-w-0'].join(' ')}>
+            <p className={styles.heroStamp}>A post-purchase record · V1 demo</p>
             <h1 className="max-w-[11ch] font-[family-name:var(--font-display)] text-[clamp(3rem,5.6vw,5.5rem)] font-750 leading-[1.02] tracking-[-0.04em] text-[#0c0f14]">Stop losing money after you buy.</h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-[#5d6673] sm:text-lg sm:leading-8">Track a purchase or subscription once. See when the price drops, the plan changes or the next renewal costs more, with the evidence and timing to decide what to do.</p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <ButtonLink href="/demo">Open interactive demo <ArrowUpRightIcon /></ButtonLink>
-              <a href="#lifecycle" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#3258d4] underline decoration-[#3258d4]/30 underline-offset-4 hover:decoration-current">See how monitoring works <ArrowUpRightIcon /></a>
+              <ButtonLink href="/signup">Get started free <ArrowUpRightIcon /></ButtonLink>
+              <a href="/how-it-works" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#3258d4] underline decoration-[#3258d4]/30 underline-offset-4 hover:decoration-current">See how it works <ArrowUpRightIcon /></a>
             </div>
             <p className="mt-4 text-xs leading-5 text-[#68717e]">No bank connection · Sample data clearly labelled</p>
+            <p className="mt-8 max-w-xl font-mono text-[10px] uppercase tracking-[0.12em] text-[#68717e]">Baseline <span className="px-1 text-[#b2ad9f]">→</span> Observe <span className="px-1 text-[#b2ad9f]">→</span> Change <span className="px-1 text-[#b2ad9f]">→</span> Evidence <span className="px-1 text-[#b2ad9f]">→</span> Deadline <span className="px-1 text-[#b2ad9f]">→</span> Action <span className="px-1 text-[#b2ad9f]">→</span> Resolution</p>
           </div>
-          <div className="min-w-0">
-            <ChangeRail />
+          <div className={[styles.heroRail, 'min-w-0'].join(' ')}>
+            <HeroPurchaseRecord />
           </div>
         </div>
       </section>
@@ -25,7 +28,7 @@ export default function HomePage() {
       <LiveChangeFeed />
       <Lifecycle />
 
-      <section className="border-y border-[#e1e5ea] bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
+      <section className="border-y border-[#d5d1c8] bg-[#fbfaf7] px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
         <div className="mx-auto max-w-[1280px]">
           <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
             <div>
@@ -48,7 +51,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#101a2a] px-5 py-20 text-white sm:px-8 sm:py-28 lg:px-10">
+      <section className={[styles.sectionDark, 'px-5 py-20 text-white sm:px-8 sm:py-28 lg:px-10'].join(' ')}>
         <div className="mx-auto max-w-[1100px]">
           <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
@@ -84,7 +87,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="data" className="border-y border-[#e1e5ea] bg-[#eef0f5] px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
+      <section id="data" className="border-y border-[#d5d1c8] bg-[#ebe7df] px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
         <div className="mx-auto grid max-w-[1100px] gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
             <h2 className="max-w-xl font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] sm:text-5xl">The demo keeps its boundaries visible.</h2>

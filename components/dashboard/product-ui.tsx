@@ -3,18 +3,20 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
-import { Bell, CirclePlus, LayoutDashboard, LogOut, Menu, Radar, Settings, ShoppingBag, WalletCards, X } from 'lucide-react'
+import { Bell, CirclePlus, LayoutDashboard, LogOut, Menu, Settings, ShoppingBag, WalletCards, X } from 'lucide-react'
 import { logout } from '@/app/auth/actions'
+import { Logo as SharedLogo } from '@/components/shared/logo'
+import { EmptyState as LifecycleEmptyState } from '@/components/shared/empty-state'
 
 const navItems = [
-  { href: '/app', label: 'Overview', icon: LayoutDashboard },
+  { href: '/app', label: 'Inbox', icon: LayoutDashboard },
   { href: '/app/purchases', label: 'Purchases', icon: ShoppingBag },
   { href: '/app/subscriptions', label: 'Subscriptions', icon: WalletCards },
   { href: '/app/alerts', label: 'Alerts', icon: Bell },
 ] as const
 
 function Logo() {
-  return <Link href="/app" aria-label="AfterPrice overview" className="flex items-center gap-2.5 font-display text-lg font-extrabold tracking-[-0.04em] text-foreground"><span className="grid h-9 w-9 place-items-center rounded-xl bg-[hsl(var(--surface-dark))] text-[hsl(var(--signal-lime))]" aria-hidden="true"><Radar className="h-[18px] w-[18px]" /></span><span>AfterPrice</span></Link>
+  return <SharedLogo href="/app" />
 }
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
@@ -30,7 +32,7 @@ function Account({ user }: { user: { name: string; email: string } }) {
 export function ProductShell({ children, user }: { children: ReactNode; user: { name: string; email: string } }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
-  const pageTitle = pathname === '/app' ? 'Overview' : pathname.startsWith('/app/purchases') ? 'Purchases' : pathname.startsWith('/app/subscriptions') ? 'Subscriptions' : pathname.startsWith('/app/alerts') ? 'Alerts' : pathname.startsWith('/app/add') || pathname.startsWith('/app/baselines/new') ? 'Add item' : pathname.startsWith('/app/settings') ? 'Settings' : 'AfterPrice'
+  const pageTitle = pathname === '/app' ? 'Inbox' : pathname.startsWith('/app/purchases') ? 'Purchases' : pathname.startsWith('/app/subscriptions') ? 'Subscriptions' : pathname.startsWith('/app/alerts') ? 'Changes' : pathname.startsWith('/app/add') || pathname.startsWith('/app/baselines/new') ? 'Add item' : pathname.startsWith('/app/settings') ? 'Settings' : 'AfterPrice'
 
   useEffect(() => {
     if (!mobileOpen) return
@@ -43,7 +45,7 @@ export function ProductShell({ children, user }: { children: ReactNode; user: { 
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-[256px] flex-col border-r border-border bg-surface px-5 py-6 lg:flex"><Logo /><div className="mt-11 flex-1"><p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--foreground-muted))]">Monitor</p><NavLinks /></div><Account user={user} /></aside>
     {mobileOpen && <button type="button" aria-label="Close navigation" onClick={() => setMobileOpen(false)} className="fixed inset-0 z-40 bg-[hsl(var(--surface-dark)/.35)] lg:hidden" />}
     <aside role="dialog" aria-modal="true" aria-hidden={!mobileOpen} aria-label="Application navigation" className={`fixed inset-y-0 left-0 z-50 flex w-[288px] flex-col bg-surface px-5 py-6 shadow-[var(--shadow-raised)] transition-transform duration-200 lg:hidden ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}><div className="flex items-center justify-between"><Logo /><button type="button" onClick={() => setMobileOpen(false)} aria-label="Close navigation" className="grid h-11 w-11 place-items-center rounded-input text-[hsl(var(--foreground-secondary))] hover:bg-[hsl(var(--surface-subtle))]"><X className="h-5 w-5" /></button></div><div className="mt-10 flex-1"><p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--foreground-muted))]">Monitor</p><NavLinks onNavigate={() => setMobileOpen(false)} /></div><Account user={user} /></aside>
-    <div className="lg:pl-[256px]"><header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur"><div className="flex min-h-[72px] items-center justify-between gap-4 px-5 sm:px-8 xl:px-12"><div className="flex items-center gap-3"><button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation" className="grid h-11 w-11 place-items-center rounded-input border border-border bg-surface text-[hsl(var(--foreground-secondary))] lg:hidden"><Menu className="h-5 w-5" /></button><div><p className="hidden text-xs text-[hsl(var(--foreground-muted))] sm:block">AfterPrice / Monitor</p><h1 className="font-display text-lg font-extrabold tracking-[-0.025em]">{pageTitle}</h1></div></div><div className="flex items-center gap-2"><Link href="/app/alerts" aria-label="Open alerts" className="relative grid h-10 w-10 place-items-center rounded-input border border-border bg-surface text-[hsl(var(--foreground-secondary))] transition-colors hover:bg-[hsl(var(--surface-subtle))]"><Bell className="h-4 w-4" /></Link><Link href="/app/add" className="hidden min-h-11 items-center gap-2 rounded-input bg-accent px-4 text-sm font-bold text-white transition-colors hover:bg-[hsl(var(--accent-hover))] sm:inline-flex"><CirclePlus className="h-4 w-4" />Add item</Link><Link href="/app/settings" aria-label="Account settings" className="grid h-10 w-10 place-items-center rounded-full bg-[hsl(var(--surface-dark))] text-white"><Settings className="h-4 w-4" /></Link></div></div></header><main id="main-content" className="mx-auto w-full max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 xl:px-12">{children}</main></div>
+    <div className="lg:pl-[256px]"><header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur"><div className="flex min-h-[72px] items-center justify-between gap-4 px-5 sm:px-8 xl:px-12"><div className="flex items-center gap-3"><button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation" className="grid h-11 w-11 items-center justify-center rounded-input border border-border bg-surface text-[hsl(var(--foreground-secondary))] lg:hidden"><Menu className="h-5 w-5" /></button><div><p className="hidden text-xs text-[hsl(var(--foreground-muted))] sm:block">AfterPrice / Monitor</p><h1 className="font-display text-lg font-extrabold tracking-[-0.025em]">{pageTitle}</h1></div></div><div className="flex items-center gap-2"><Link href="/app/alerts" aria-label="Open alerts" className="relative grid h-10 w-10 place-items-center rounded-input border border-border bg-surface text-[hsl(var(--foreground-secondary))] transition-colors hover:bg-[hsl(var(--surface-subtle))]"><Bell className="h-4 w-4" /></Link><Link href="/app/add" className="hidden min-h-11 items-center gap-2 rounded-input bg-accent px-4 text-sm font-bold text-white transition-colors hover:bg-[hsl(var(--accent-hover))] sm:inline-flex"><CirclePlus className="h-4 w-4" />Add item</Link><Link href="/app/settings" aria-label="Account settings" className="grid h-10 w-10 place-items-center rounded-full bg-[hsl(var(--surface-dark))] text-white"><Settings className="h-4 w-4" /></Link></div></div></header><main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1440px] px-5 py-8 outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-8 sm:py-10 xl:px-12">{children}</main></div>
   </div>
 }
 
@@ -61,5 +63,5 @@ export function StatusBadge({ children, tone = 'neutral' }: { children: ReactNod
 }
 
 export function EmptyState({ title, description, action, className = '' }: { title: string; description: string; action?: ReactNode; className?: string }) {
-  return <div className={`flex min-h-56 flex-col items-center justify-center rounded-dashboard border border-dashed border-border bg-[hsl(var(--surface-subtle))] px-6 py-10 text-center ${className}`}><span className="grid h-11 w-11 place-items-center rounded-full bg-[hsl(var(--accent-soft))] text-accent" aria-hidden="true"><Radar className="h-5 w-5" /></span><p className="mt-4 font-display text-xl font-bold">{title}</p><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[hsl(var(--foreground-secondary))]">{description}</p>{action && <div className="mt-5">{action}</div>}</div>
+  return <LifecycleEmptyState title={title} description={description} action={action} className={className} />
 }

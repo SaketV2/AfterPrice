@@ -44,8 +44,8 @@
   --neutral: var(--foreground-secondary);
   --neutral-soft: var(--surface-subtle);
 
-  --font-display: var(--font-instrument-sans), "Instrument Sans", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-display);
+  --font-display: var(--font-instrument-serif), "Instrument Serif", Georgia, serif;
+  --font-sans: var(--font-instrument-sans), "Instrument Sans", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
   --radius-major: 24px;
   --radius-dashboard: 18px;
   --radius-card: 14px;
@@ -128,6 +128,10 @@ h6 {
   font-weight: 700;
   letter-spacing: -0.02em;
   text-wrap: balance;
+}
+
+.font-editorial {
+  font-family: var(--font-display);
 }
 
 a,

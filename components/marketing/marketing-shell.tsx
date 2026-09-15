@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowUpRightIcon, ButtonLink, MobileNav, Wordmark } from './marketing-ui'
 import styles from './marketing.module.css'
 import { logout } from '@/app/auth/actions'
@@ -91,19 +91,8 @@ function FooterColumn({ title, links }: { title: string; links: Array<[string, s
 }
 
 export function MarketingShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const shellRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const main = shellRef.current?.querySelector('main')
-    if (!main) return
-    main.id = 'main-content'
-    main.tabIndex = -1
-  }, [pathname])
-
   return (
-    <div ref={shellRef} className="min-h-screen bg-[#f6f6f3] text-[#0c0f14]">
-      <style dangerouslySetInnerHTML={{ __html: '@keyframes marketing-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.animate-\\[marketing-rise_.55s_ease-out_both\\]{animation:none!important}}' }} />
+    <div className={[styles.marketingRoot, 'min-h-screen'].join(' ')}>
       {children}
     </div>
   )

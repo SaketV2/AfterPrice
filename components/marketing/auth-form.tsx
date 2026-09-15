@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { login, requestPasswordReset, signup, updatePassword, type AuthState } from '@/app/auth/actions'
 import { FormMessage, Wordmark } from './marketing-ui'
+import styles from './marketing.module.css'
 
 type Mode = 'login' | 'signup' | 'forgot' | 'reset'
 const initialState: AuthState = {}
@@ -15,7 +16,7 @@ export function AuthForm({ mode, next = '/app' }: { mode: Mode; next?: string })
   const title = { login: 'Open your change ledger.', signup: 'Make the change visible.', forgot: 'Reset your password.', reset: 'Choose a new password.' }[mode]
   const description = { login: 'Sign in to view your saved baselines and current comparisons.', signup: 'Create your AfterPrice account. Your baselines stay private to you.', forgot: 'We’ll send a secure reset link if the address belongs to an account.', reset: 'Use at least 8 characters for your new password.' }[mode]
   return (
-    <div className="w-full max-w-md rounded-2xl border border-[#d8dde5] bg-white p-6 sm:p-9">
+    <div className={[styles.authCard, 'w-full max-w-md p-6 sm:p-9'].join(' ')}>
       <Link href="/" className="inline-flex min-h-11 items-center" aria-label="AfterPrice home"><Wordmark /></Link>
       <h1 className="mt-8 font-[family-name:var(--font-display)] text-3xl font-bold leading-tight tracking-[-0.03em] sm:text-4xl">{title}</h1>
       <p className="mt-4 text-sm leading-6 text-[#5d6673]">{description}</p>

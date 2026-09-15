@@ -10,6 +10,10 @@ The app supports authenticated purchase and subscription entry, real private per
 
 The visual mode is warm paper and white editorial surfaces for public routes, with concentrated graphite surfaces for product previews, evidence and capability boundaries. The shipped product ledger is a light ledger. The global theme provider exposes light, dark and system values and `app/globals.css` defines dark aliases, but `ProductShell` injects a light-oriented inline token map; treat dark mode as a declared compatibility layer rather than a separate fully specified product theme.
 
+## Brand mark and type roles
+
+AfterPrice uses one shared two-stroke mark in `components/shared/logo.tsx` and `app/icon.svg`: two rounded diagonal strokes suggesting an abstract A and a continuing price trail. Marketing, auth and product surfaces use that same geometry. Instrument Serif is loaded through `next/font/google` as the editorial display face; the existing local Instrument Sans remains the body, navigation, controls and dense-record face.
+
 ## Colour roles and tokens
 
 The product shell's runtime tokens in `components/dashboard/product-ui.tsx` are the most specific product palette:
@@ -35,8 +39,9 @@ Global semantic HSL variables in `app/globals.css` provide light and dark aliase
 
 ## Typography
 
-- The declared display and body family is `Instrument Sans`, falling back to `Manrope`, `Inter` and the system sans stack. `app/layout.tsx` does not import a webfont, so the rendered face depends on what is available at runtime.
-- Headings are heavy, tight and editorial: generally weight 700 to 800, negative tracking from roughly `-0.02em` to `-0.065em`, and line-height around `0.94` to `1.05`.
+- Marketing H1/H2 treatments, the AfterPrice wordmark and selected large product headings use `Instrument Serif`, falling back to Georgia/serif.
+- Body copy, navigation, controls, forms and dense product records use the existing local `Instrument Sans` variable font.
+- Headings are tight and editorial, generally with negative tracking from roughly `-0.02em` to `-0.065em`, and line-height around `0.94` to `1.05`.
 - Body text is plain and readable: 16px with 1.5 line-height globally, with marketing descriptions commonly 16 to 20px and 28 to 32px line-height; product supporting text is commonly 14 to 16px and 24px line-height.
 - Eyebrows, navigation section labels and metadata use 10 to 11px bold uppercase text with wide tracking, usually `0.12em` to `0.18em`.
 - Prices, dates, counts and other changing values use tabular numerals. Rail and timeline indices use a monospace stack.
@@ -51,9 +56,9 @@ Elevation is restrained. Use thin borders and surface contrast first, then soft 
 
 ## Component grammar
 
-Marketing pages use a sticky wordmark header, uppercase eyebrow, oversized heading, concise supporting copy and a clear action pair. Content alternates between warm paper, white divider bands and dark evidence or capability sections. Lists, tables and timelines rely on borders and dividers rather than dense card grids.
+Marketing pages use a sticky shared wordmark header, uppercase eyebrow, oversized serif heading, concise supporting copy and a clear action pair. Content uses warm paper, white divider bands and dark evidence or capability surfaces. Flat records, tables and timelines rely on borders and dividers rather than repeated card grids. The homepage and `/how-it-works` use the AfterPrice Trail to tell the lifecycle from baseline through resolution.
 
-Product pages use a 256px desktop sidebar, sticky context header, page intro, bordered white panels and a change-ledger row. A standard record keeps:
+Product pages use a 256px desktop sidebar, sticky context header, page intro, bordered white panels and a decision-ledger row. A standard record keeps:
 
 1. title, provider/source and type/state badges;
 2. baseline beside current value;
@@ -67,24 +72,27 @@ Buttons are compact, semibold and at least 40 to 48px high. Primary actions use 
 
 The marketing Change Rail is a dark `#101a2a` panel with a lime section label, a demo-sequence pill and a dark map. Its SVG track is a thick graphite shadow with a dashed lime path. Four keyboard-operable nodes represent Purchase, Change detected, Deadline and Action. The selected node gets a lime border, raised position and darker raised fill; the readout below exposes the selected state and explanation.
 
-The rail map is at least 390px tall on desktop and 420px on mobile. Its path drifts with a 14-second linear loop. Node, feed-record and header transitions are about 180ms. Selected feed detail enters with a 220ms upward fade. The marketing `Reveal` helper uses a 550ms rise animation.
+The rail map is at least 390px tall on desktop and 420px on mobile. There is no continuous decorative drift. Node, feed-record and header transitions are about 180ms; one-time progression and reveal motion uses roughly 450–550ms.
 
-The lifecycle section pairs a scrolling six-stage list with a dark sticky state panel. An `IntersectionObserver` changes the active stage as each list item enters the reading window; the panel is `aria-live="polite"`, shows the current value and marks the active list item with `aria-current="step"` and an `In view` label. The timeline uses a 1px rule and numbered circular markers. On mobile the state panel is no longer sticky and the Change Rail SVG rotates vertically with alternating node positions.
+The lifecycle section pairs a scrolling seven-stage list with a dark sticky state panel. A scroll-position observer changes the active stage as each list item enters the reading window; the panel is `aria-live="polite"`, shows the current value and marks the active list item with `aria-current="step"` and an `In view` label. The timeline uses a 1px rule and numbered circular markers. On mobile the state panel is no longer sticky and the Change Rail SVG is replaced by a readable stacked sequence.
 
-All of these effects are subordinate to comprehension. `prefers-reduced-motion: reduce` removes or nearly removes transitions, animations and smooth scrolling, including rail drift, reveal, feed detail and timeline transitions.
+All of these effects are subordinate to comprehension. `prefers-reduced-motion: reduce` removes movement and smooth scrolling rather than merely slowing it.
 
 ## Product ledger states
 
-The service layer derives one `ChangeLedgerRow` per tracked item and sorts rows by state, then priority, then observed time. The state tabs are:
+The presentation layer derives one decision-ledger row per tracked item and sorts rows by state, then priority, then updated time. The state groups are:
 
 | State | Meaning | Tone |
 | --- | --- | --- |
+| Action required | An actionable stored change is pinned first for review | Danger |
 | Changes | An active price, plan or renewal difference needs review | Danger |
 | Due soon | A claim or renewal deadline is within 14 days | Warning |
 | Watching | The baseline is active and no action is due | Accent |
 | Resolved | The item or all of its alerts are resolved or dismissed | Success |
 
-Change types are price drop, price increase, plan change, renewal warning and watching/no change. A row distinguishes potential money from confirmed money, labels evidence as captured, manual or unavailable, and uses `Review adjustment`, `Review before renewal`, `Keep watching` or `View resolution` as the action grammar. Resolution history can record recovery, dismissal or resolution. A lower current price is an opportunity to review, not proof of a refund.
+Change types are price drop, price increase, plan change, renewal warning and watching/no change. A row distinguishes potential money from confirmed money, labels evidence as captured or unavailable, and uses one supported next action such as `Review current source`, `Review updated plan`, `Review before renewal`, `View item` or `View history`. A lower current price is an opportunity to review, not proof of a refund.
+
+Empty states use a small reusable lifecycle illustration made from semantic CSS/SVG primitives: baseline → later observation → difference, followed by the real CTA. No sample records are inserted into authenticated accounts.
 
 ## Responsive rules
 
@@ -98,7 +106,7 @@ Change types are price drop, price increase, plan change, renewal warning and wa
 ## Accessibility and content rules
 
 - Preserve semantic headings, landmarks, labelled navigation, table captions and scoped table headers. Interactive rail nodes and filters expose pressed state; tabs expose selected state; accordions expose expanded state and controls.
-- Maintain the global visible cobalt focus treatment: a 3px outline with 3px offset and focus ring. Interactive controls generally have a minimum height of 40px, with primary controls commonly 44 to 48px.
+- Every rendered route exposes exactly one static `main#main-content` target with `tabIndex={-1}`; the skip link never depends on hydration or DOM mutation. Maintain the global visible cobalt focus treatment: a 3px outline with 3px offset and focus ring. Interactive controls generally have a minimum height of 40px, with primary controls commonly 44 to 48px.
 - Use `aria-live="polite"` for changing selected detail, `aria-current="step"` for the active lifecycle stage and clear labels for icon-only controls. Mobile marketing navigation returns focus to its trigger on Escape; product navigation closes on Escape.
 - Write in concrete, specific language. Use AfterPrice consistently and prefer the sequence baseline, change, evidence, deadline, action, resolution.
 - Label public illustrative content as sample or demo data. Say when a check is manual or unavailable. Do not imply retailer access, bank connection, automatic claims, guaranteed refunds, live monitoring or confirmed recovery when the implementation does not provide it.
@@ -106,4 +114,4 @@ Change types are price drop, price increase, plan change, renewal warning and wa
 
 ## Source files
 
-Grounded in `PRODUCT.md`, `app/globals.css`, `app/layout.tsx`, `app/(marketing)/page.tsx`, `components/marketing/marketing.module.css`, `components/marketing/product-preview.tsx`, `components/marketing/marketing-ui.tsx`, `components/marketing/marketing-shell.tsx`, `components/dashboard/product-ui.tsx`, `features/afterprice/queries.ts`, `server/catalogue`, `server/monitoring` and `lib/theme/theme-provider.tsx`.
+Grounded in `PRODUCT.md`, `app/globals.css`, `app/layout.tsx`, `app/icon.svg`, `app/not-found.tsx`, `app/robots.ts`, `app/sitemap.ts`, `app/(marketing)/page.tsx`, `components/shared/logo.tsx`, `components/marketing/marketing.module.css`, `components/marketing/product-preview.tsx`, `components/marketing/marketing-ui.tsx`, `components/marketing/marketing-shell.tsx`, `components/dashboard/ledger.tsx`, `components/dashboard/product-ui.tsx`, `components/dashboard/tracked-item-detail.tsx`, `components/shared/empty-state.tsx`, `features/afterprice/queries.ts`, `server/catalogue`, `server/monitoring` and `lib/theme/theme-provider.tsx`.

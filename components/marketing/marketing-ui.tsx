@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowUpRight, Check, ChevronDown, Menu, X } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
+import { BrandMark, Wordmark as SharedWordmark } from '@/components/shared/logo'
 import styles from './marketing.module.css'
 
 export function ArrowUpRightIcon({ className = '' }: { className?: string }) {
@@ -12,12 +13,9 @@ export function ArrowUpRightIcon({ className = '' }: { className?: string }) {
 
 export function Wordmark({ dark = false }: { dark?: boolean }) {
   return (
-    <span className={['inline-flex items-center gap-2.5 font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.035em]', dark ? 'text-white' : 'text-[#0c0f14]'].join(' ')}>
-      <span aria-hidden="true" className={['relative grid size-8 place-items-center overflow-hidden rounded-[10px]', dark ? 'bg-[#b7bd91]' : 'bg-[#0c0f14]'].join(' ')}>
-        <span className={['absolute h-[2px] w-4 -rotate-[34deg] rounded-full', dark ? 'bg-[#0c1016]' : 'bg-white'].join(' ')} />
-        <span className={['absolute h-[2px] w-2.5 translate-x-[5px] translate-y-[4px] rotate-[52deg] rounded-full', dark ? 'bg-[#0c1016]' : 'bg-white'].join(' ')} />
-      </span>
-      AfterPrice
+    <span className={['inline-flex items-center gap-2.5', dark ? 'text-white' : 'text-[#0c0f14]'].join(' ')}>
+      <BrandMark className="h-8 w-8" decorative />
+      <SharedWordmark className="text-[1.45rem]" />
     </span>
   )
 }
@@ -41,7 +39,7 @@ export function ButtonLink({
 }) {
   const base = 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-center text-sm font-semibold leading-5 transition-colors duration-200'
   const variants = {
-    primary: 'bg-[#0c0f14] text-white hover:bg-[#2a2f37]',
+    primary: 'bg-[#3258d4] text-white hover:bg-[#2448bd]',
     secondary: 'border border-[#cfd5dd] bg-white text-[#0c0f14] hover:border-[#3258d4] hover:text-[#2448bd]',
     quiet: 'text-[#5d6673] hover:bg-[#eef0f5] hover:text-[#0c0f14]',
     light: 'bg-[#f5f7fa] text-[#0c0f14] hover:bg-[#b7bd91]',
@@ -70,7 +68,7 @@ export function SectionIntro({
 }
 
 export function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={['motion-reveal animate-[marketing-rise_.55s_ease-out_both]', className].join(' ')}>{children}</div>
+  return <div className={['motion-reveal', styles.reveal, className].join(' ')}>{children}</div>
 }
 
 export function MobileNav({ authenticated = false }: { authenticated?: boolean }) {

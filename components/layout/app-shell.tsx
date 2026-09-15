@@ -18,7 +18,7 @@ export function AppShell({ children, className }: { children: React.ReactNode; c
           <Logo className="absolute left-1/2 -translate-x-1/2" />
           <ThemeToggle />
         </header>
-        <div className={cn("mx-auto min-h-[calc(100vh-4rem)] w-full max-w-[1440px] px-5 py-8 sm:px-8 lg:px-10 lg:py-10", className)}>{children}</div>
+        <main id="main-content" tabIndex={-1} className={cn("mx-auto min-h-[calc(100vh-4rem)] w-full max-w-[1440px] px-5 py-8 outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-8 lg:px-10 lg:py-10", className)}>{children}</main>
       </div>
     </div>
   );
