@@ -1,47 +1,30 @@
 import type { Metadata } from "next";
-import { Instrument_Serif } from "next/font/google";
-import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider, type Theme } from "@/lib/theme";
 import { createClient } from "@/lib/supabase/server";
 
-const instrumentSans = localFont({
-  src: "./fonts/InstrumentSans-Variable.ttf",
-  variable: "--font-instrument-sans",
-  display: "swap",
-  weight: "400 700",
-  fallback: ["Segoe UI", "Arial", "sans-serif"],
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-instrument-serif",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: {
-    default: "AfterPrice | Stop losing money after you buy",
+    default: "AfterPrice | Keep what changed after checkout",
     template: "%s | AfterPrice",
   },
   description:
-    "Track a purchase or subscription once. Get alerted when the price drops, the plan changes or the next renewal becomes more expensive, with the evidence and deadline you need to act.",
+    "Keep the original price, later changes, evidence and timing together after you buy or subscribe.",
   applicationName: "AfterPrice",
   openGraph: {
-    title: "AfterPrice | Stop losing money after you buy",
+    title: "AfterPrice | Keep what changed after checkout",
     description:
-      "Track a purchase or subscription once. Get alerted when the price drops, the plan changes or the next renewal becomes more expensive, with the evidence and deadline you need to act.",
+      "Keep the original price, later changes, evidence and timing together after you buy or subscribe.",
     type: "website",
   },
 };
 
 const designContract = `<!--
   THESIS: AfterPrice makes change after purchase legible through baseline, change, evidence, deadline, action and resolution, refusing a generic finance dashboard.
-  OWN-WORLD: Warm light neutrals, graphite product surfaces, cobalt controls, signal-lime opportunities and restrained instrument-like UI.
+  OWN-WORLD: Warm paper, receipt-white surfaces, deep moss actions, saffron change marks, coral pressure states, and ledger rules.
   STORY: A visitor sees what they originally paid, what moved, what evidence exists and the next realistic action.
-  FIRST VIEWPORT: Public routes pair the factual promise with a monitor surface and demo action; app routes foreground impact, alerts, evidence and deadlines.
-  FORM: Editorial monitoring instrument, committed from the supplied AfterPrice redesign brief; direction seed 87bf7606.
+  FIRST VIEWPORT: Public routes pair a plain post-checkout promise with a tangible price-change record; app routes foreground impact, evidence and deadlines.
+  FORM: Paper trail after checkout, assigned direction 4 of the grounded list; direction seed b046054d.
   FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 -->`;
 
@@ -54,10 +37,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     if (preferences?.theme === "light" || preferences?.theme === "dark" || preferences?.theme === "system") defaultTheme = preferences.theme;
   }
   return (
-    <html lang="en-AU" className={`${instrumentSans.variable} ${instrumentSerif.variable}`} suppressHydrationWarning>
+    <html lang="en-AU" suppressHydrationWarning>
       <body>
-        <a href="#main-content" className="skip-link">Skip to main content</a>
         <div aria-hidden="true" hidden dangerouslySetInnerHTML={{ __html: designContract }} />
+        <a href="#main-content" className="skip-link">Skip to main content</a>
         <ThemeProvider defaultTheme={defaultTheme}>{children}</ThemeProvider>
       </body>
     </html>

@@ -4,48 +4,48 @@
 
 :root {
   /* HSL triplets keep Tailwind's alpha utilities working across themes. */
-  --background: 44 30% 95%;
-  --surface: 0 0% 100%;
-  --surface-subtle: 45 18% 92%;
-  --surface-cool: 218 45% 95%;
-  --surface-dark: 222 21% 11%;
-  --surface-dark-raised: 222 18% 16%;
-  --surface-dark-elevated: 220 16% 21%;
-  --foreground: 220 20% 11%;
-  --foreground-secondary: 220 11% 33%;
-  --foreground-muted: 218 10% 43%;
-  --foreground-on-dark: 45 25% 97%;
-  --border: 220 13% 85%;
-  --border-strong: 220 11% 69%;
+  --background: 43 34% 93%;
+  --surface: 48 100% 99%;
+  --surface-subtle: 132 32% 89%;
+  --surface-cool: 143 26% 94%;
+  --surface-dark: 147 28% 23%;
+  --surface-dark-raised: 145 23% 29%;
+  --surface-dark-elevated: 145 20% 35%;
+  --foreground: 90 8% 10%;
+  --foreground-secondary: 80 4% 34%;
+  --foreground-muted: 80 4% 40%;
+  --foreground-on-dark: 48 100% 99%;
+  --border: 40 15% 81%;
+  --border-strong: 39 16% 63%;
 
   /* Brand roles: cobalt is interactive; sage is a restrained signal, not body text. */
-  --cobalt: 222 80% 52%;
-  --cobalt-hover: 222 77% 43%;
-  --cobalt-soft: 222 92% 95%;
-  --signal-lime: 68 27% 65%;
-  --signal-lime-ink: 75 28% 18%;
-  --signal-lime-soft: 70 30% 90%;
+  --cobalt: 147 28% 23%;
+  --cobalt-hover: 148 31% 18%;
+  --cobalt-soft: 132 32% 89%;
+  --signal-lime: 42 63% 55%;
+  --signal-lime-ink: 42 70% 12%;
+  --signal-lime-soft: 44 54% 87%;
 
   /* Backwards-compatible semantic aliases used by existing components. */
   --accent: var(--cobalt);
   --accent-hover: var(--cobalt-hover);
   --accent-soft: var(--cobalt-soft);
-  --powder: 211 55% 90%;
-  --success: 151 61% 30%;
-  --success-soft: 145 45% 91%;
-  --warning: 31 93% 37%;
-  --warning-soft: 38 96% 91%;
-  --danger: 5 60% 41%;
-  --danger-soft: 7 72% 93%;
-  --potential: 250 47% 44%;
-  --potential-soft: 250 100% 95%;
+  --powder: 132 32% 89%;
+  --success: 147 28% 23%;
+  --success-soft: 132 32% 89%;
+  --warning: 42 63% 38%;
+  --warning-soft: 44 54% 87%;
+  --danger: 10 50% 39%;
+  --danger-soft: 10 45% 90%;
+  --potential: 147 28% 23%;
+  --potential-soft: 132 32% 89%;
   --info: var(--cobalt);
   --info-soft: var(--cobalt-soft);
   --neutral: var(--foreground-secondary);
   --neutral-soft: var(--surface-subtle);
 
-  --font-display: var(--font-instrument-serif), "Instrument Serif", Georgia, serif;
-  --font-sans: var(--font-instrument-sans), "Instrument Sans", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-display: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --radius-major: 24px;
   --radius-dashboard: 18px;
   --radius-card: 14px;
@@ -64,34 +64,34 @@
 
 [data-theme="dark"],
 .dark {
-  --background: 222 21% 8%;
-  --surface: 222 19% 13%;
-  --surface-subtle: 222 16% 17%;
-  --surface-cool: 219 20% 20%;
-  --surface-dark: 222 21% 8%;
-  --surface-dark-raised: 222 18% 16%;
-  --surface-dark-elevated: 220 16% 21%;
-  --foreground: 45 25% 96%;
-  --foreground-secondary: 217 12% 75%;
-  --foreground-muted: 217 9% 62%;
-  --foreground-on-dark: 45 25% 96%;
-  --border: 220 14% 27%;
-  --border-strong: 219 12% 42%;
-  --cobalt: 220 95% 71%;
-  --cobalt-hover: 220 100% 80%;
-  --cobalt-soft: 220 45% 26%;
-  --signal-lime: 68 36% 70%;
-  --signal-lime-ink: 70 28% 16%;
-  --signal-lime-soft: 70 24% 24%;
-  --powder: 212 49% 76%;
-  --success: 150 54% 60%;
-  --success-soft: 151 31% 20%;
-  --warning: 35 90% 67%;
-  --warning-soft: 35 30% 22%;
-  --danger: 5 75% 68%;
-  --danger-soft: 5 30% 23%;
-  --potential: 250 82% 78%;
-  --potential-soft: 250 38% 26%;
+  --background: 146 20% 12%;
+  --surface: 145 18% 17%;
+  --surface-subtle: 145 18% 22%;
+  --surface-cool: 145 22% 25%;
+  --surface-dark: 145 24% 9%;
+  --surface-dark-raised: 145 22% 14%;
+  --surface-dark-elevated: 145 20% 20%;
+  --foreground: 43 39% 94%;
+  --foreground-secondary: 40 15% 75%;
+  --foreground-muted: 40 12% 65%;
+  --foreground-on-dark: 43 39% 94%;
+  --border: 145 16% 32%;
+  --border-strong: 145 14% 46%;
+  --cobalt: 132 40% 70%;
+  --cobalt-hover: 132 48% 78%;
+  --cobalt-soft: 145 24% 25%;
+  --signal-lime: 42 72% 66%;
+  --signal-lime-ink: 42 70% 12%;
+  --signal-lime-soft: 42 30% 25%;
+  --powder: 132 30% 31%;
+  --success: 132 40% 70%;
+  --success-soft: 145 24% 25%;
+  --warning: 42 72% 66%;
+  --warning-soft: 42 30% 25%;
+  --danger: 10 72% 68%;
+  --danger-soft: 10 30% 25%;
+  --potential: 132 40% 70%;
+  --potential-soft: 145 24% 25%;
   color-scheme: dark;
 }
 
@@ -124,9 +124,9 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--font-sans);
+  font-weight: 750;
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
 
@@ -217,8 +217,8 @@ select:disabled {
   z-index: 100;
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  background: #101820;
-  color: white;
+  background: hsl(var(--surface-dark));
+  color: hsl(var(--foreground-on-dark));
   font-weight: 600;
   transform: translateY(calc(-100% - 2rem));
 }
@@ -233,7 +233,7 @@ section[id] {
 }
 
 .navigation-dialog::backdrop {
-  background: rgb(16 24 32 / 40%);
+  background: hsl(var(--surface-dark) / 0.4);
 }
 
 @media (prefers-reduced-motion: reduce) {

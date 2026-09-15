@@ -9,8 +9,6 @@ import {
   Clock3,
   ExternalLink,
   Eye,
-  PackageSearch,
-  WalletCards,
 } from 'lucide-react'
 import { compareBaseline, formatMoney } from '@/features/afterprice/comparison'
 import type { BaselineRecord, Comparison } from '@/features/afterprice/types'
@@ -47,12 +45,19 @@ const stateOrder: Array<{ key: LedgerState; label: string; description: string }
 ]
 
 const stateStyles: Record<LedgerState, { dot: string; badge: string }> = {
-  action: { dot: 'bg-[hsl(var(--danger))]', badge: 'bg-[hsl(var(--danger-soft))] text-[hsl(var(--danger))]' },
+  action: { dot: 'bg-[hsl(var(--signal-lime))]', badge: 'bg-[hsl(var(--signal-lime-soft))] text-[hsl(var(--signal-lime-ink))]' },
   due: { dot: 'bg-[hsl(var(--warning))]', badge: 'bg-[hsl(var(--warning-soft))] text-[hsl(var(--warning))]' },
-  changed: { dot: 'bg-[hsl(var(--accent))]', badge: 'bg-[hsl(var(--accent-soft))] text-accent' },
+  changed: { dot: 'bg-[hsl(var(--danger))]', badge: 'bg-[hsl(var(--danger-soft))] text-[hsl(var(--danger))]' },
   watching: { dot: 'bg-[hsl(var(--foreground-muted))]', badge: 'bg-[hsl(var(--surface-subtle))] text-[hsl(var(--foreground-secondary))]' },
   resolved: { dot: 'bg-[hsl(var(--success))]', badge: 'bg-[hsl(var(--success-soft))] text-[hsl(var(--success))]' },
 }
+
+const valueToneClasses = {
+  neutral: 'text-foreground',
+  success: 'text-[hsl(var(--success))]',
+  warning: 'text-[hsl(var(--warning))]',
+  danger: 'text-[hsl(var(--danger))]',
+} as const
 
 function dateLabel(value: string | null | undefined, withYear = false) {
   if (!value) return 'Not recorded'
@@ -173,8 +178,8 @@ function StateBadge({ entry }: { entry: LedgerEntry }) {
   return <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${style.badge}`}><span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} aria-hidden="true" />{entry.stateLabel}</span>
 }
 
-function ValueCell({ label, value, detail, emphasis = false }: { label: string; value: string; detail: string; emphasis?: boolean }) {
-  return <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[hsl(var(--foreground-muted))]">{label}</p><p className={`mt-1 truncate text-sm font-bold tabular-nums ${emphasis ? 'text-[hsl(var(--success))]' : ''}`}>{value}</p><p className="mt-1 line-clamp-2 text-xs leading-4 text-[hsl(var(--foreground-secondary))]">{detail}</p></div>
+function ValueCell({ label, value, detail, emphasis = false, tone = 'neutral' }: { label: string; value: string; detail: string; emphasis?: boolean; tone?: keyof typeof valueToneClasses }) {
+  return <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[hsl(var(--foreground-muted))]">{label}</p><p className="mt-1 text-sm font-bold leading-5 tabular-nums"><span className={emphasis ? 'inline-flex rounded-[5px] bg-[hsl(var(--success-soft))] px-1.5 py-0.5 text-[hsl(var(--success))]' : valueToneClasses[tone]}>{value}</span></p><p className="mt-1 line-clamp-2 text-xs leading-4 text-[hsl(var(--foreground-secondary))]">{detail}</p></div>
 }
 
 function EvidenceCell({ entry }: { entry: LedgerEntry }) {
@@ -182,36 +187,50 @@ function EvidenceCell({ entry }: { entry: LedgerEntry }) {
 }
 
 function ActionLink({ entry }: { entry: LedgerEntry }) {
-  return <Link href={`/app/baselines/${entry.record.id}`} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-input border border-border px-3 text-sm font-bold text-accent transition-colors hover:border-accent hover:bg-[hsl(var(--accent-soft))] xl:w-auto xl:min-w-[142px]">{entry.nextAction}<ArrowRight className="h-4 w-4" /></Link>
+  return <Link href={`/app/baselines/${entry.record.id}`} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-input bg-[hsl(var(--surface-dark))] px-3 text-sm font-bold text-[hsl(var(--foreground-on-dark))] transition-colors hover:bg-[hsl(var(--surface-dark-raised))] xl:w-auto xl:min-w-[142px]">{entry.nextAction}<ArrowRight className="h-4 w-4" /></Link>
+}
+
+function recordMarkLabel(record: BaselineRecord) {
+  const source = record.entities.brand?.trim() || record.entities.provider?.trim() || record.display_name.trim()
+  const parts = source.split(/[\s/-]+/).filter(Boolean)
+  return (parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : source.slice(0, 2)).toUpperCase()
+}
+
+function RecordMark({ entry }: { entry: LedgerEntry }) {
+  const isPurchase = entry.record.baseline_type === 'purchase'
+  return <span className={`relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[11px] border ${isPurchase ? 'border-border bg-[hsl(var(--surface-subtle))] text-[hsl(var(--foreground-secondary))]' : 'border-[hsl(var(--signal-lime)/.55)] bg-[hsl(var(--signal-lime-soft))] text-[hsl(var(--signal-lime-ink))]'}`} aria-hidden="true"><svg viewBox="0 0 44 44" className="absolute inset-0 h-full w-full" fill="none"><path d={isPurchase ? 'M9 14.5h26M9 22h18M9 29.5h22' : 'M22 8v28M8 22h28'} stroke="currentColor" strokeOpacity=".18" strokeWidth="1.5" /><circle cx="34" cy="10" r="3" fill="currentColor" fillOpacity=".3" /></svg><span className="relative text-[10px] font-extrabold tracking-[0.08em]">{recordMarkLabel(entry.record)}</span></span>
 }
 
 function Identity({ entry, mobile = false }: { entry: LedgerEntry; mobile?: boolean }) {
   const record = entry.record
   const typeLabel = record.baseline_type === 'purchase' ? 'Purchase' : 'Subscription'
-  return <div className="min-w-0"><div className="flex items-start gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[hsl(var(--surface-subtle))] text-[hsl(var(--foreground-secondary))]" aria-hidden="true">{record.baseline_type === 'purchase' ? <PackageSearch className="h-5 w-5" /> : <WalletCards className="h-5 w-5" />}</span><div className="min-w-0"><Link href={`/app/baselines/${record.id}`} className="block truncate text-sm font-bold hover:text-accent">{record.display_name}</Link><p className="mt-1 truncate text-xs text-[hsl(var(--foreground-secondary))]">{record.entities.provider} · {typeLabel}</p><p className="mt-1 truncate text-xs text-[hsl(var(--foreground-muted))]">{record.entities.variant ?? record.plan_name ?? 'Identity recorded'}</p></div></div>{mobile ? <div className="mt-3"><StateBadge entry={entry} /></div> : null}</div>
+  const providerLabel = record.entities.brand && record.entities.brand !== record.entities.provider ? `${record.entities.brand} · ${record.entities.provider}` : record.entities.provider
+  return <div className="min-w-0"><div className="flex items-start gap-3"><RecordMark entry={entry} /><div className="min-w-0"><Link href={`/app/baselines/${record.id}`} className="block break-words text-sm font-bold leading-5 hover:text-accent">{record.display_name}</Link><p className="mt-1 truncate text-xs font-semibold text-[hsl(var(--foreground-secondary))]">{providerLabel} · {typeLabel}</p><p className="mt-1 truncate text-xs text-[hsl(var(--foreground-muted))]">{record.entities.variant ?? record.plan_name ?? record.entities.category ?? 'Identity recorded'}</p></div></div>{mobile ? <div className="mt-3"><StateBadge entry={entry} /></div> : null}</div>
 }
 
 function DesktopRow({ entry }: { entry: LedgerEntry }) {
-  return <article className="hidden grid-cols-[minmax(180px,1.35fr)_minmax(105px,.75fr)_minmax(105px,.75fr)_minmax(125px,.95fr)_minmax(150px,1fr)_minmax(120px,.8fr)_minmax(142px,.8fr)] items-center gap-4 border-b border-border px-5 py-4 last:border-b-0 xl:grid"><Identity entry={entry} /><ValueCell label="Baseline" value={entry.baseline} detail={entry.record.baseline_type === 'purchase' ? `Paid ${dateLabel(entry.record.captured_at, true)}` : `Saved ${dateLabel(entry.record.captured_at, true)}`} /><ValueCell label="Current" value={entry.current} detail={entry.observed} /><ValueCell label="Difference" value={entry.difference} detail={entry.differenceDetail} emphasis={Boolean(entry.potentialSavingCents)} /><EvidenceCell entry={entry} /><ValueCell label="Deadline" value={entry.deadline} detail={entry.deadlineDetail} /><ActionLink entry={entry} /></article>
+  const deadlineTone = entry.deadline === 'Passed' || entry.deadline === 'Today' ? 'danger' : entry.state === 'due' ? 'warning' : 'neutral'
+  return <article className="hidden grid-cols-[minmax(190px,1.35fr)_minmax(112px,.75fr)_minmax(112px,.75fr)_minmax(130px,.95fr)_minmax(160px,1fr)_minmax(124px,.8fr)_minmax(142px,.8fr)] items-center gap-4 border-b border-border px-5 py-4 transition-colors last:border-b-0 hover:bg-[hsl(var(--surface-cool)/.52)] xl:grid"><Identity entry={entry} /><ValueCell label="Baseline" value={entry.baseline} detail={entry.record.baseline_type === 'purchase' ? `Paid ${dateLabel(entry.record.captured_at, true)}` : `Saved ${dateLabel(entry.record.captured_at, true)}`} /><ValueCell label="Current" value={entry.current} detail={entry.observed} /><ValueCell label="Difference" value={entry.difference} detail={entry.differenceDetail} emphasis={Boolean(entry.potentialSavingCents)} tone={entry.comparison.kind === 'price_increase' ? 'danger' : undefined} /><EvidenceCell entry={entry} /><ValueCell label="Deadline" value={entry.deadline} detail={entry.deadlineDetail} tone={deadlineTone} /><ActionLink entry={entry} /></article>
 }
 
 function MobileRow({ entry }: { entry: LedgerEntry }) {
-  return <article className="border-b border-border p-4 last:border-b-0 sm:p-5 xl:hidden"><div className="flex items-start justify-between gap-4"><Identity entry={entry} mobile /><span className="shrink-0 text-right text-xs font-semibold text-[hsl(var(--foreground-muted))]">{entry.observed === 'Not observed' ? 'Watching' : entry.observed}</span></div><div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-border pt-4 sm:grid-cols-4"><ValueCell label="Baseline" value={entry.baseline} detail="Your saved record" /><ValueCell label="Current" value={entry.current} detail={entry.observed} /><ValueCell label="Difference" value={entry.difference} detail={entry.differenceDetail} emphasis={Boolean(entry.potentialSavingCents)} /><ValueCell label="Deadline" value={entry.deadline} detail={entry.deadlineDetail} /></div><div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"><EvidenceCell entry={entry} /><ActionLink entry={entry} /></div></article>
+  const deadlineTone = entry.deadline === 'Passed' || entry.deadline === 'Today' ? 'danger' : entry.state === 'due' ? 'warning' : 'neutral'
+  return <article className="border-b border-border p-4 last:border-b-0 transition-colors hover:bg-[hsl(var(--surface-cool)/.38)] sm:p-5 xl:hidden"><div className="flex items-start justify-between gap-4"><Identity entry={entry} mobile /><span className="shrink-0 text-right text-xs font-semibold text-[hsl(var(--foreground-muted))]">{entry.observed === 'Not observed' ? 'Watching' : entry.observed}</span></div><div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-border pt-4 sm:grid-cols-4"><ValueCell label="Baseline" value={entry.baseline} detail="Your saved record" /><ValueCell label="Current" value={entry.current} detail={entry.observed} /><ValueCell label="Difference" value={entry.difference} detail={entry.differenceDetail} emphasis={Boolean(entry.potentialSavingCents)} tone={entry.comparison.kind === 'price_increase' ? 'danger' : undefined} /><ValueCell label="Deadline" value={entry.deadline} detail={entry.deadlineDetail} tone={deadlineTone} /></div><div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"><EvidenceCell entry={entry} /><ActionLink entry={entry} /></div></article>
 }
 
 export function LedgerRows({ entries }: { entries: LedgerEntry[] }) {
   if (!entries.length) return null
-  return <div className="overflow-hidden rounded-dashboard border border-border bg-surface shadow-soft"><div className="hidden grid-cols-[minmax(180px,1.35fr)_minmax(105px,.75fr)_minmax(105px,.75fr)_minmax(125px,.95fr)_minmax(150px,1fr)_minmax(120px,.8fr)_minmax(142px,.8fr)] gap-4 border-b border-border bg-[hsl(var(--surface-subtle))] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[hsl(var(--foreground-muted))] xl:grid"><span>Item</span><span>Baseline</span><span>Current</span><span>Difference</span><span>Evidence</span><span>Deadline</span><span>Next action</span></div>{entries.map(entry => <div key={entry.record.id}><DesktopRow entry={entry} /><MobileRow entry={entry} /></div>)}</div>
+  return <div className="overflow-hidden rounded-card border border-border bg-surface shadow-soft"><div className="hidden grid-cols-[minmax(190px,1.35fr)_minmax(112px,.75fr)_minmax(112px,.75fr)_minmax(130px,.95fr)_minmax(160px,1fr)_minmax(124px,.8fr)_minmax(142px,.8fr)] gap-4 border-b border-border bg-[hsl(var(--surface-subtle)/.62)] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[hsl(var(--foreground-muted))] xl:grid"><span>Item / provider</span><span>Baseline</span><span>Current</span><span>Difference</span><span>Evidence</span><span>Deadline</span><span>Next action</span></div>{entries.map(entry => <div key={entry.record.id}><DesktopRow entry={entry} /><MobileRow entry={entry} /></div>)}</div>
 }
 
 export function Ledger({ entries, emptyTitle = 'Nothing to review yet', emptyDescription = 'Add a purchase or subscription to create a baseline. Later observations will appear here when they are stored.', emptyAction }: { entries: LedgerEntry[]; emptyTitle?: string; emptyDescription?: string; emptyAction?: React.ReactNode }) {
   const grouped = stateOrder.map(group => ({ ...group, entries: entries.filter(entry => entry.state === group.key) })).filter(group => group.entries.length)
   if (!grouped.length) return <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
-  return <div className="space-y-7">{grouped.map(group => <section key={group.key} aria-labelledby={`ledger-${group.key}`}><div className="mb-3 flex flex-wrap items-end justify-between gap-2"><div className="flex items-center gap-2.5"><span className={`h-2.5 w-2.5 rounded-full ${stateStyles[group.key].dot}`} aria-hidden="true" /><h2 id={`ledger-${group.key}`} className="font-display text-xl font-extrabold tracking-[-0.02em]">{group.label}</h2><span className="rounded-full bg-[hsl(var(--surface-subtle))] px-2 py-0.5 text-xs font-bold text-[hsl(var(--foreground-secondary))]">{group.entries.length}</span></div><p className="text-xs text-[hsl(var(--foreground-muted))]">{group.description}</p></div><LedgerRows entries={group.entries} /></section>)}</div>
+  return <div className="space-y-8">{grouped.map(group => <section key={group.key} aria-labelledby={`ledger-${group.key}`}><div className="mb-3 flex flex-wrap items-end justify-between gap-2 border-b border-border pb-2"><div className="flex items-center gap-2.5"><span className={`h-2.5 w-2.5 rounded-full ${stateStyles[group.key].dot}`} aria-hidden="true" /><h2 id={`ledger-${group.key}`} className="font-sans text-xl font-extrabold tracking-[-0.02em]">{group.label}</h2><span className="rounded-full bg-[hsl(var(--surface-subtle))] px-2 py-0.5 text-xs font-bold text-[hsl(var(--foreground-secondary))]">{group.entries.length}</span></div><p className="text-xs text-[hsl(var(--foreground-muted))]">{group.description}</p></div><LedgerRows entries={group.entries} /></section>)}</div>
 }
 
 export function LedgerLegend() {
-  return <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[hsl(var(--foreground-secondary))]"><span className="inline-flex items-center gap-2"><CircleAlert className="h-3.5 w-3.5 text-[hsl(var(--danger))]" />Action required</span><span className="inline-flex items-center gap-2"><Clock3 className="h-3.5 w-3.5 text-[hsl(var(--warning))]" />Due soon</span><span className="inline-flex items-center gap-2"><Eye className="h-3.5 w-3.5 text-[hsl(var(--foreground-muted))]" />Watching</span><span className="inline-flex items-center gap-2"><CircleCheck className="h-3.5 w-3.5 text-[hsl(var(--success))]" />Resolved</span></div>
+  return <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[hsl(var(--foreground-secondary))]"><span className="inline-flex items-center gap-2"><CircleAlert className="h-3.5 w-3.5 text-[hsl(var(--signal-lime-ink))]" />Action required</span><span className="inline-flex items-center gap-2"><Clock3 className="h-3.5 w-3.5 text-[hsl(var(--warning))]" />Due soon</span><span className="inline-flex items-center gap-2"><ArrowUpRight className="h-3.5 w-3.5 text-[hsl(var(--danger))]" />Changed</span><span className="inline-flex items-center gap-2"><Eye className="h-3.5 w-3.5 text-[hsl(var(--foreground-muted))]" />Watching</span><span className="inline-flex items-center gap-2"><CircleCheck className="h-3.5 w-3.5 text-[hsl(var(--success))]" />Resolved</span></div>
 }
 
 export function DifferenceIcon({ entry }: { entry: LedgerEntry }) {

@@ -1,48 +1,95 @@
 'use client'
 
 import { ArrowDownRight, ArrowRight, ArrowUpRight, CheckCircle2, Clock3, FileSearch, ShieldAlert } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { changeTypes, lifecycleSteps, liveChanges, type ChangeRecord } from './marketing-data'
 import styles from './marketing.module.css'
 
-const lifecycleActivationBand = {
-  top: 0.3,
-  bottom: 0.52,
-} as const
+function ProductGlyph({ compact = false }: { compact?: boolean }) {
+  return (
+    <svg className={compact ? styles.productGlyphCompact : styles.productGlyph} viewBox="0 0 120 90" fill="none" aria-hidden="true">
+      <path d="M28 56V39c0-17 13-30 30-30s30 13 30 30v17" stroke="currentColor" strokeWidth="7" strokeLinecap="round" />
+      <path d="M26 48h-4c-7 0-12 5-12 12v7c0 6 5 11 11 11h7c4 0 7-3 7-7V55c0-4-3-7-7-7Zm68 0h4c7 0 12 5 12 12v7c0 6-5 11-11 11h-7c-4 0-7-3-7-7V55c0-4 3-7 7-7Z" fill="currentColor" />
+      <path d="M48 80h24" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity=".5" />
+    </svg>
+  )
+}
 
 export function HeroPurchaseRecord() {
   return (
     <div className={styles.heroRecordStage} role="img" aria-label="Illustrative Sony WH-1000XM6 purchase record showing a 349 dollar baseline, a current price of 299 dollars, a potential 50 dollar difference, source evidence and four days left to review the retailer policy.">
-      <div className={styles.heroPaper} aria-hidden="true"><span>Same product.<br />Lower price.<br />You win.</span></div>
-      <div className={styles.heroReceipt} aria-hidden="true"><span>PRICE CHECK</span><strong>$299</strong><small>06 SEP 2026</small></div>
-      <div className={styles.heroRecord}>
-        <div className="flex items-center justify-between gap-3 border-b border-[#dce2e6] pb-4 text-[10px] font-bold uppercase tracking-[0.16em] text-[#55616c]"><span>Purchase tracked</span><span className="text-[#0c0f14]">•••</span></div>
-        <div className="mt-5 flex items-start justify-between gap-4"><div><p className="text-xs text-[#77838d]">Sony</p><h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-bold leading-tight tracking-[-0.035em] sm:text-3xl">WH-1000XM6</h2><p className="mt-1 text-sm text-[#55616c]">Wireless noise-cancelling headphones</p></div><span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-[#eff2f4] text-xl font-bold text-[#0c0f14]">S</span></div>
-        <div className="mt-6 grid gap-3 border-y border-[#dce2e6] py-5 sm:grid-cols-[1fr_1fr_1.2fr] sm:items-end"><div><p className="text-xs text-[#77838d]">Your price</p><p className="mt-1 font-[family-name:var(--font-display)] text-3xl font-bold tabular-nums">$349</p><p className="text-xs text-[#77838d]">02 Sep 2026</p></div><div><p className="text-xs text-[#77838d]">Now</p><p className="mt-1 font-[family-name:var(--font-display)] text-3xl font-bold tabular-nums">$299</p><p className="text-xs text-[#77838d]">06 Sep 2026</p></div><div className="rounded-xl bg-[#eef6d5] px-4 py-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#55616c]">Potential difference</p><p className="mt-1 font-[family-name:var(--font-display)] text-2xl font-bold tabular-nums text-[#253414]">$50 below</p><p className="text-xs text-[#55616c]">your baseline</p></div></div>
-        <div className="mt-5 grid grid-cols-4 gap-2 text-[10px] text-[#55616c]"><div><span className="mb-2 block h-2 w-2 rounded-full bg-[#0c0f14]" /><strong className="block text-[#0c0f14]">Purchased</strong><span>02 Sep</span></div><div><span className="mb-2 block h-2 w-2 rounded-full bg-[#9aa4ad]" /><strong className="block text-[#0c0f14]">Observed</strong><span>06 Sep</span></div><div><span className="mb-2 block h-2 w-2 rounded-full bg-[#b8d95b] ring-2 ring-[#0c0f14] ring-offset-1" /><strong className="block text-[#0c0f14]">Deadline</strong><span>4 days left</span></div><div><span className="mb-2 block h-2 w-2 rounded-full border border-[#9aa4ad]" /><strong className="block text-[#0c0f14]">Action</strong><span>Review</span></div></div>
-        <div className="mt-6 grid gap-4 border-t border-[#dce2e6] pt-5 sm:grid-cols-[1fr_auto] sm:items-end"><div><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#77838d]">Observed source</p><p className="mt-1 text-sm font-bold text-[#0c0f14]">Sony Store · price page</p><p className="mt-1 text-xs text-[#77838d]">06 Sep 2026 · 11:42 AM</p></div><span className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#3258d4] px-4 text-sm font-semibold text-white">Review options <ArrowRight aria-hidden="true" className="h-4 w-4" /></span></div>
+      <div className={styles.heroPaper} aria-hidden="true">
+        <div className={styles.heroPaperRule} />
+        <span className={styles.heroPaperLabel}>after checkout</span>
+        <ProductGlyph />
+        <span className={styles.heroPaperNote}>same model<br />new signal</span>
       </div>
+      <div className={styles.heroReceipt} aria-hidden="true">
+        <span>PRICE CHECK</span>
+        <strong>$299</strong>
+        <small>06 SEP 2026</small>
+        <div className={styles.receiptRule} />
+        <span>SONY STORE</span>
+      </div>
+      <article className={styles.heroRecord}>
+        <div className={styles.recordTopline}><span>Purchase tracked</span><span>Sample record</span></div>
+        <div className={styles.recordIdentity}>
+          <div>
+            <p className={styles.recordMeta}>Sony</p>
+            <h2>WH-1000XM6</h2>
+            <p className={styles.recordSubcopy}>Wireless noise-cancelling headphones</p>
+          </div>
+          <div className={styles.productBadge}><ProductGlyph compact /></div>
+        </div>
+        <div className={styles.recordValues}>
+          <div><p className={styles.recordMeta}>Your price</p><strong>$349</strong><span>02 Sep 2026</span></div>
+          <div><p className={styles.recordMeta}>Observed</p><strong>$299</strong><span>06 Sep 2026</span></div>
+          <div className={styles.changeHighlight}><p>Potential difference</p><strong>$50 below</strong><span>your baseline</span></div>
+        </div>
+        <div className={styles.recordTrail}>
+          <div><span className={styles.trailDot} /><strong>Purchased</strong><small>02 Sep</small></div>
+          <div><span className={styles.trailDot} /><strong>Observed</strong><small>06 Sep</small></div>
+          <div><span className={styles.trailDotActive} /><strong>Deadline</strong><small>4 days left</small></div>
+          <div><span className={styles.trailDotEmpty} /><strong>Action</strong><small>Review</small></div>
+        </div>
+        <div className={styles.recordEvidence}>
+          <div><p className={styles.recordMeta}>Observed source</p><strong>Sony Store · price page</strong><span>06 Sep 2026 · 11:42 AM</span></div>
+          <span className={styles.recordAction}>Review options <ArrowRight aria-hidden="true" size={15} /></span>
+        </div>
+      </article>
     </div>
   )
 }
 
 export function ChangeRail() {
-  const bars = [
-    { label: 'Paid', value: '$349', height: 82, tone: 'bg-[#8792ff]' },
-    { label: 'Day 4', value: '$339', height: 78, tone: 'bg-[#8792ff]' },
-    { label: 'Day 8', value: '$329', height: 72, tone: 'bg-[#8792ff]' },
-    { label: 'Day 12', value: '$299', height: 58, tone: 'bg-[#b7bd91]' },
-  ]
-
-  return <div className="rounded-[16px] bg-[#101a2a] p-4 text-white sm:p-6" role="img" aria-label="Illustrative AfterPrice Trail for a price change: you paid 349 dollars, the same product later reached 299 dollars, creating a potential 50 dollar saving before the return window ends."><div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#283241] pb-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#b9c4ff]">AfterPrice Trail</p><h2 className="mt-2 max-w-[15ch] font-[family-name:var(--font-display)] text-2xl font-700 leading-tight tracking-[-0.03em] sm:text-[1.75rem]">A lower price becomes useful when you can still act.</h2></div><span className="shrink-0 rounded-full border border-[#3b485b] px-2.5 py-1 text-[10px] font-semibold text-[#c0c8d2]">Illustrative example</span></div><div className="mt-6 grid grid-cols-[1fr_auto] gap-5 sm:grid-cols-[1fr_auto_auto] sm:items-end"><div><p className="text-xs text-[#aab3c0]">Sony WH-1000XM6</p><p className="mt-1 text-3xl font-bold tabular-nums tracking-[-0.04em]">$349 <span className="text-lg font-normal text-[#aab3c0]">paid</span></p></div><div className="text-right"><p className="text-xs text-[#aab3c0]">Current match</p><p className="mt-1 text-2xl font-bold tabular-nums text-[#b7bd91]">$299</p></div><div className="col-span-2 rounded-lg bg-[#1a2230] px-3 py-2 sm:col-span-1"><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#aab3c0]">Potential saving</p><p className="mt-1 text-lg font-bold tabular-nums text-[#b7bd91]">$50</p></div></div><div className="mt-6 rounded-[12px] border border-[#283241] bg-[#131922] p-4"><div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.12em] text-[#aab3c0]"><span>Price observed after checkout</span><span>Return window</span></div><div className="relative mt-4 h-52 border-b border-[#3b485b] pt-3"><div className="pointer-events-none absolute inset-x-0 top-9 border-t border-dashed border-[#3b485b]" /><div className="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dashed border-[#283241]" /><div className="pointer-events-none absolute bottom-[22%] left-0 right-0 border-t border-dashed border-[#b7bd91]" /><span className="absolute bottom-[22%] right-0 -translate-y-1/2 rounded bg-[#b7bd91] px-2 py-1 text-[10px] font-bold text-[#192119]">$299 found</span><div className="relative flex h-full items-end gap-3 px-1 sm:gap-5">{bars.map(bar => <div key={bar.label} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><div className={`w-full max-w-12 rounded-t-md ${bar.tone}`} style={{ height: `${bar.height}%` }} /><span className="text-[10px] text-[#aab3c0]">{bar.label}</span></div>)}</div></div><div className="mt-4 grid gap-2 text-xs leading-5 sm:grid-cols-[1fr_auto]"><p className="text-[#c0c8d2]">AfterPrice keeps the original price, the later match and the timing in one record.</p><p className="font-semibold text-[#b7bd91] sm:text-right">4 days left to review terms</p></div></div></div>
+  return (
+    <div className={styles.rail} role="img" aria-label="Illustrative AfterPrice Trail for a price change: you paid 349 dollars, the same product later reached 299 dollars, creating a potential 50 dollar difference before the return window ends.">
+      <div className={styles.railHeader}>
+        <div><p className={styles.mossKicker}>AfterPrice Trail</p><h2>A lower price matters when there is still time to act.</h2></div>
+        <span className={styles.sampleTag}>Illustrative example</span>
+      </div>
+      <div className={styles.railSummary}>
+        <div><p>Baseline</p><strong>$349</strong><span>Sony WH-1000XM6 · paid</span></div>
+        <div><p>Current</p><strong className={styles.saffronValue}>$299</strong><span>same model · observed</span></div>
+        <div className={styles.railDelta}><p>Potential difference</p><strong>$50</strong><span>review before the window closes</span></div>
+      </div>
+      <div className={styles.railChart}>
+        <div className={styles.railChartLabels}><span>price observed after checkout</span><span>return window</span></div>
+        <svg className={styles.railSvg} viewBox="0 0 760 210" preserveAspectRatio="none" aria-hidden="true">
+          <path className={styles.railGridLine} d="M0 44H760M0 104H760M0 166H760" />
+          <path className={styles.railTrackShadow} d="M42 50C166 55 222 72 332 82s167 20 228 42 91 26 158 32" />
+          <path className={styles.railTrack} d="M42 50C166 55 222 72 332 82s167 20 228 42 91 26 158 32" />
+          <circle cx="42" cy="50" r="6" className={styles.railPoint} /><circle cx="332" cy="82" r="6" className={styles.railPoint} /><circle cx="560" cy="124" r="6" className={styles.railPointActive} /><circle cx="718" cy="156" r="6" className={styles.railPoint} />
+        </svg>
+        <div className={styles.railChartTicks}><span>Paid</span><span>Day 4</span><span>Day 8</span><span>Day 12</span></div>
+      </div>
+      <div className={styles.railFooter}><span>Baseline → later observation → difference</span><strong>4 days left to review terms</strong></div>
+    </div>
+  )
 }
 
 function statusClass(tone: ChangeRecord['statusTone']) {
-  return {
-    positive: 'bg-[#e1f3ea] text-[#237a57]',
-    warning: 'bg-[#fff0d6] text-[#8b5514]',
-    negative: 'bg-[#fce5e5] text-[#9d3636]',
-  }[tone]
+  return { positive: styles.statusPositive, warning: styles.statusWarning, negative: styles.statusNegative }[tone]
 }
 
 type FeedFilter = 'All' | 'Price' | 'Plan' | 'Renewal'
@@ -66,76 +113,43 @@ export function LiveChangeFeed() {
   }
 
   return (
-    <section id="catches" className="bg-[#0c1016] px-5 py-20 text-white sm:px-8 sm:py-28 lg:px-10">
-      <div className="mx-auto max-w-[1280px]">
-        <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:gap-12">
-          <div>
-            <h2 className="max-w-xl font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] sm:text-5xl">Flat records for the ways a cost can move after purchase.</h2>
-            <p className="mt-5 max-w-md text-base leading-7 text-[#c0c8d2]">Each illustrative record keeps the baseline, current state, evidence and next action in the same view.</p>
-            <p className="mt-5 text-xs leading-5 text-[#aab3c0]">Sample data · last checked 06 Sep 2026</p>
-          </div>
-
-          <div>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Filter change records">
-              {filters.map(value => (
-                <button type="button" key={value} aria-pressed={filter === value} onClick={() => setFilter(value)} className={['min-h-11 rounded-[10px] border px-3.5 text-sm font-semibold transition', filter === value ? 'border-[#b7bd91] bg-[#b7bd91] text-[#192119]' : 'border-[#3b485b] text-[#c0c8d2] hover:border-[#8792ff] hover:text-white'].join(' ')}>
-                  {value}
-                </button>
-              ))}
+    <section id="catches" className={styles.feedSection}>
+      <div className={styles.pageContainer}>
+        <div className={styles.feedHeading}>
+          <div><p className={styles.sectionMarker}>01 · change types</p><h2>Three ways the trail can move.</h2></div>
+          <p>One record can hold a lower price, a changed plan or a more expensive renewal. The useful part is the same: what was true, what changed, where it came from and what to review next.</p>
+        </div>
+        <div className={styles.feedBrowser}>
+          <div className={styles.feedList}>
+            <div className={styles.filterRow} role="group" aria-label="Filter change records">
+              <span>Sample records</span>
+              <div>{filters.map(value => <button type="button" key={value} aria-pressed={filter === value} onClick={() => setFilter(value)} className={filter === value ? styles.filterActive : styles.filterButton}>{value}</button>)}</div>
             </div>
-            <div className="mt-4 grid gap-2">
+            <div className={styles.feedRecords}>
               {visibleRecords.map(record => {
                 const active = selected.id === record.id
-                return (
-                  <button type="button" key={record.id} onClick={() => setSelectedId(record.id)} aria-pressed={active} className={[styles.feedRecord, active ? styles.feedRecordActive : '', 'grid w-full grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 rounded-[12px] p-4 text-left'].join(' ')}>
-                    <span className="col-span-2 flex flex-wrap items-center gap-2">
-                      <span className={['rounded-full px-2 py-1 text-[10px] font-bold', statusClass(record.statusTone)].join(' ')}>{reviewed.has(record.id) ? 'Reviewed' : record.status}</span>
-                      <span className="text-xs text-[#aab3c0]">{record.provider}</span>
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold leading-5 text-[#f5f7fa]">{record.title}</span>
-                      <span className="mt-1 block text-sm font-medium leading-5 tabular-nums text-[#c0c8d2]">{record.difference}</span>
-                    </span>
-                    <span className="inline-flex items-center self-center gap-1 text-xs font-semibold text-[#b7bd91]">Inspect <ArrowUpRight size={14} aria-hidden="true" /></span>
-                  </button>
-                )
+                return <button type="button" key={record.id} onClick={() => setSelectedId(record.id)} aria-pressed={active} className={[styles.feedRecord, active ? styles.feedRecordActive : ''].join(' ')}>
+                  <span className={styles.feedRecordTop}><span className={[styles.statusTag, statusClass(record.statusTone)].join(' ')}>{reviewed.has(record.id) ? 'Reviewed' : record.status}</span><span>{record.provider}</span></span>
+                  <span className={styles.feedRecordTitle}>{record.title}</span>
+                  <span className={styles.feedRecordDifference}>{record.difference}</span>
+                  <span className={styles.feedRecordInspect}>Inspect <ArrowUpRight size={14} aria-hidden="true" /></span>
+                </button>
               })}
             </div>
           </div>
-        </div>
-
-        <div className={[styles.feedDetail, 'mt-6 grid gap-6 rounded-[16px] border border-[#283241] bg-[#131922] p-5 sm:p-7 lg:grid-cols-[1fr_0.9fr] lg:gap-8'].join(' ')} key={selected.id} aria-live="polite">
-          <div>
-            <div className="flex items-start justify-between gap-5">
-              <div>
-                <h3 className="font-[family-name:var(--font-display)] text-2xl font-700 leading-tight tracking-[-0.03em] sm:text-3xl">{selected.title}</h3>
-                <p className="mt-2 text-sm text-[#aab3c0]">{selected.label} · {selected.provider}</p>
-              </div>
-              <span className="grid size-10 shrink-0 place-items-center rounded-[12px] bg-[#1a2230] text-[#b7bd91]"><FileSearch aria-hidden="true" size={19} /></span>
+          <article className={styles.feedDetail} key={selected.id} aria-live="polite">
+            <div className={styles.detailMain}>
+              <div className={styles.detailTitleRow}><div><p className={styles.sectionMarker}>{selected.label} · {selected.provider}</p><h3>{selected.title}</h3></div><span className={styles.detailIcon}><FileSearch aria-hidden="true" size={19} /></span></div>
+              <p className={styles.detailSummary}>{selected.summary}</p>
+              <div className={styles.detailFacts}><div><span>Baseline</span><strong>{selected.baseline}</strong></div><div><span>Current</span><strong className={styles.detailCurrent}>{selected.current}</strong></div><div><span>Deadline</span><strong className={styles.detailDeadline}>{selected.deadline}</strong></div></div>
+              <div className={styles.detailActionRow}><button type="button" onClick={toggleReviewed} className={styles.reviewButton}><CheckCircle2 aria-hidden="true" size={16} /> {isReviewed ? 'Reopen record' : 'Mark reviewed'}</button><span>{selected.action}</span></div>
             </div>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-[#c0c8d2]">{selected.summary}</p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-y border-[#283241] py-4 sm:grid-cols-3">
-              <div><p className="text-xs text-[#aab3c0]">Baseline</p><p className="mt-1 text-lg font-bold leading-6 tabular-nums">{selected.baseline}</p></div>
-              <div><p className="text-xs text-[#aab3c0]">Current</p><p className="mt-1 text-lg font-bold leading-6 tabular-nums text-[#cfe3f5]">{selected.current}</p></div>
-              <div className="col-span-2 sm:col-span-1"><p className="text-xs text-[#aab3c0]">Deadline</p><p className="mt-1 text-sm font-semibold leading-6 text-[#b7bd91]">{selected.deadline}</p></div>
-            </div>
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <button type="button" onClick={toggleReviewed} className="inline-flex min-h-11 items-center gap-2 rounded-[12px] bg-[#b7bd91] px-4 text-sm font-semibold text-[#192119] hover:bg-[#d1d6a8]">
-                <CheckCircle2 aria-hidden="true" size={16} /> {isReviewed ? 'Reopen record' : 'Mark reviewed'}
-              </button>
-              <span className="text-xs leading-5 text-[#aab3c0]">{selected.action}</span>
-            </div>
-          </div>
-          <aside className="border-t border-[#283241] pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0" aria-label="Evidence for selected change">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h4 className="font-semibold">Evidence</h4>
-              <span className="inline-flex items-center gap-1.5 text-xs text-[#b7bd91]"><CheckCircle2 aria-hidden="true" size={14} /> Source available</span>
-            </div>
-            <dl className="mt-5 divide-y divide-[#283241]">
-              {selected.evidence.map(row => <div key={row.label} className="grid gap-1 py-3 first:pt-0 last:pb-0 sm:grid-cols-[0.8fr_1.2fr] sm:gap-3"><dt className="text-xs text-[#aab3c0]">{row.label}</dt><dd className="text-sm leading-6 text-[#f5f7fa]">{row.value}</dd></div>)}
-            </dl>
-            <p className="mt-5 flex items-center gap-2 border-t border-[#283241] pt-4 text-xs leading-5 text-[#aab3c0]"><Clock3 aria-hidden="true" size={14} className="shrink-0" /> Observed {selected.observed}</p>
-          </aside>
+            <aside className={styles.evidencePanel} aria-label="Evidence for selected change">
+              <div className={styles.evidenceHeader}><h4>Evidence</h4><span><CheckCircle2 aria-hidden="true" size={14} /> Source available</span></div>
+              <dl>{selected.evidence.map(row => <div key={row.label}><dt>{row.label}</dt><dd>{row.value}</dd></div>)}</dl>
+              <p className={styles.observedLine}><Clock3 aria-hidden="true" size={14} /> Observed {selected.observed}</p>
+            </aside>
+          </article>
         </div>
       </div>
     </section>
@@ -144,115 +158,32 @@ export function LiveChangeFeed() {
 
 export function Lifecycle() {
   const [active, setActive] = useState(0)
-  const activeRef = useRef(0)
-  const stepRefs = useRef<Array<HTMLLIElement | null>>([])
-
-  useEffect(() => {
-    let frameId: number | null = null
-
-    const updateActive = () => {
-      frameId = null
-
-      const bandTop = window.innerHeight * lifecycleActivationBand.top
-      const bandBottom = window.innerHeight * lifecycleActivationBand.bottom
-      const steps = stepRefs.current
-        .map((element, index) => element ? { element, index } : null)
-        .filter((step): step is { element: HTMLLIElement; index: number } => step !== null)
-        .map(({ element, index }) => ({ index, rect: element.getBoundingClientRect() }))
-
-      if (!steps.length) return
-
-      let nextIndex = 0
-      let bestIntersectionRatio = 0
-      let hasIntersectingStep = false
-
-      steps.forEach(({ index, rect }) => {
-        const intersectionHeight = Math.max(0, Math.min(rect.bottom, bandBottom) - Math.max(rect.top, bandTop))
-        const intersectionRatio = rect.height > 0 ? intersectionHeight / rect.height : 0
-
-        if (intersectionRatio > bestIntersectionRatio) {
-          bestIntersectionRatio = intersectionRatio
-          nextIndex = index
-          hasIntersectingStep = true
-        }
-      })
-
-      if (!hasIntersectingStep) {
-        nextIndex = steps[0].rect.top > bandBottom ? 0 : steps[steps.length - 1].index
-      }
-
-      if (nextIndex !== activeRef.current) {
-        activeRef.current = nextIndex
-        setActive(nextIndex)
-      }
-    }
-
-    const requestUpdate = () => {
-      if (frameId === null) frameId = window.requestAnimationFrame(updateActive)
-    }
-
-    requestUpdate()
-    window.addEventListener('scroll', requestUpdate, { passive: true })
-    window.addEventListener('resize', requestUpdate)
-
-    return () => {
-      window.removeEventListener('scroll', requestUpdate)
-      window.removeEventListener('resize', requestUpdate)
-      if (frameId !== null) window.cancelAnimationFrame(frameId)
-    }
-  }, [])
-
   const current = lifecycleSteps[active]
 
   return (
-    <section id="lifecycle" className="px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
-      <div className="mx-auto max-w-[1100px]">
-        <div className="mb-10 max-w-3xl">
-          <h2 className="font-[family-name:var(--font-display)] text-4xl font-700 leading-[1.08] tracking-[-0.035em] sm:text-5xl">A change becomes useful when the sequence stays intact.</h2>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-[#5d6673]">Scroll through the lifecycle. The state panel follows the record from baseline to resolution, so potential money never gets mistaken for money recovered.</p>
-        </div>
-        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-14">
+    <section id="lifecycle" className={styles.lifecycleSection}>
+      <div className={styles.pageContainer}>
+        <div className={styles.lifecycleHeading}><p className={styles.sectionMarker}>02 · the decision path</p><h2>Keep the useful sequence intact.</h2><p>AfterPrice turns a baseline into a practical next step. Select a stage to see what it contributes to the record.</p></div>
+        <div className={styles.lifecycleGrid}>
           <div className={styles.timelineStage}>
             <div className={styles.timelineStagePanel} aria-live="polite">
-              <div className="flex items-center justify-between gap-4 border-b border-[#283241] px-5 py-4 text-xs text-[#aab3c0] sm:px-7">
-                <span>Sample lifecycle</span>
-                 <span className="font-mono text-[#b7bd91]">{String(active + 1).padStart(2, '0')} / 07</span>
-              </div>
-              <div key={current.name} className={[styles.timelineStageContent, 'px-5 py-6 sm:px-7 sm:py-7'].join(' ')}>
-                <p className="text-sm font-semibold text-[#8792ff]">{current.name}</p>
-                <p className={['mt-5', styles.timelineStageValue].join(' ')}>{current.value}</p>
-                <p className="mt-3 text-sm text-[#c0c8d2]">{current.subvalue}</p>
-                <div className="mt-6 border-t border-[#283241] pt-5">
-                  <p className="font-semibold">{current.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-[#aab3c0]">{current.description}</p>
-                </div>
+              <div className={styles.stageTopline}><span>Sample lifecycle</span><span>{String(active + 1).padStart(2, '0')} / 07</span></div>
+              <div className={styles.timelineStageContent}>
+                <p className={styles.mossKicker}>{current.name}</p>
+                <p className={styles.timelineStageValue}>{current.value}</p>
+                <p className={styles.stageSubvalue}>{current.subvalue}</p>
+                <div className={styles.stageExplanation}><strong>{current.title}</strong><p>{current.description}</p></div>
               </div>
             </div>
           </div>
-          <div>
-            <ol className={[styles.timeline, 'space-y-6'].join(' ')}>
-              {lifecycleSteps.map((step, index) => (
-                <li
-                  key={step.name}
-                  ref={element => { stepRefs.current[index] = element }}
-                  data-index={index}
-                  className={[styles.timelineStep, active === index ? styles.timelineStepActive : '', 'flex gap-4'].join(' ')}
-                  aria-current={active === index ? 'step' : undefined}
-                >
-                  <span className={styles.timelineMarker}>{String(index + 1).padStart(2, '0')}</span>
-                  <div className="min-w-0 pb-2">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <h3 className="font-[family-name:var(--font-display)] text-lg font-700 tracking-[-0.025em]">{step.name}</h3>
-                      <span className={['rounded-full bg-[#e7eafe] px-2 py-1 text-[10px] font-bold text-[#3258d4]', active === index ? '' : 'invisible'].join(' ')}>In view</span>
-                    </div>
-                    <p className="mt-1 text-base font-semibold text-[#0c0f14]">{step.title}</p>
-                    <p className="mt-1 max-w-lg text-sm leading-6 text-[#5d6673]">{step.description}</p>
-                    <p className="mt-2 text-sm font-semibold tabular-nums text-[#3258d4] lg:hidden">{step.value}<span className="font-normal text-[#5d6673]"> · {step.subvalue}</span></p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
+          <ol className={styles.timeline}>
+            {lifecycleSteps.map((step, index) => <li key={step.name} className={[styles.timelineStep, active === index ? styles.timelineStepActive : ''].join(' ')}>
+              <button type="button" className={styles.timelineStepButton} aria-current={active === index ? 'step' : undefined} onClick={() => setActive(index)}>
+                <span className={styles.timelineMarker}>{String(index + 1).padStart(2, '0')}</span>
+                <span className={styles.timelineStepCopy}><span className={styles.timelineStepTitle}>{step.name}{active === index && <span className={styles.inView}>In view</span>}</span><strong>{step.title}</strong><small>{step.description}</small><em>{step.value} · {step.subvalue}</em></span>
+              </button>
+            </li>)}
+          </ol>
         </div>
       </div>
     </section>
@@ -261,21 +192,10 @@ export function Lifecycle() {
 
 export function MonitorPreview({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={['overflow-hidden rounded-[16px] bg-[#101a2a] p-4 text-white', compact ? '' : 'sm:p-6'].join(' ')}>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#283241] pb-4">
-        <div className="flex min-w-0 items-center gap-2"><span className="grid size-7 shrink-0 place-items-center rounded-[8px] bg-[#b7bd91] text-[10px] font-bold text-[#192119]">AP</span><span className="text-sm font-semibold tracking-tight">AfterPrice change ledger</span></div>
-        <span className="shrink-0 rounded-full border border-[#3b485b] px-2.5 py-1 text-[10px] font-semibold text-[#c0c8d2]">Demo data</span>
-      </div>
-      <div className="mt-5 divide-y divide-[#283241]">
-        {changeTypes.map((item, index) => (
-          <div key={item.category} className="grid gap-3 py-4 first:pt-0 sm:grid-cols-[0.8fr_1fr_auto] sm:items-center">
-            <div><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8792ff]">{item.category}</p><p className="mt-1 text-sm font-semibold">{item.title}</p></div>
-            <div className="text-sm text-[#c0c8d2]"><span className="text-[#aab3c0]">{item.baseline}</span><span className="mx-2 text-[#b7bd91]">to</span><span>{item.current}</span></div>
-            <div className="flex items-center gap-2 text-right text-xs"><span className={index === 0 ? 'text-[#b7bd91]' : index === 1 ? 'text-[#f0bd71]' : 'text-[#b9c4ff]'}>{item.action}</span>{index === 0 ? <ArrowDownRight size={15} aria-hidden="true" /> : <ArrowUpRight size={15} aria-hidden="true" />}</div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-4 flex items-center gap-2 border-t border-[#283241] pt-4 text-xs leading-5 text-[#c0c8d2]"><ShieldAlert aria-hidden="true" size={15} className="shrink-0 text-[#b7bd91]" /> Potential figures stay labelled until resolved.</div>
+    <div className={[styles.monitorPreview, compact ? styles.monitorPreviewCompact : ''].join(' ')}>
+      <div className={styles.monitorTopline}><div><span className={styles.monitorMark}>AP</span><span>AfterPrice change ledger</span></div><span className={styles.sampleTag}>Demo data</span></div>
+      <div className={styles.monitorRows}>{changeTypes.map((item, index) => <div key={item.category} className={styles.monitorRow}><div><p>{item.category}</p><strong>{item.title}</strong></div><div><span>{item.baseline}</span><b>→</b><strong>{item.current}</strong></div><span className={index === 0 ? styles.monitorOpportunity : index === 1 ? styles.monitorPressure : styles.monitorWatch}>{item.action} {index === 0 ? <ArrowDownRight size={15} aria-hidden="true" /> : <ArrowUpRight size={15} aria-hidden="true" />}</span></div>)}</div>
+      <p className={styles.monitorNote}><ShieldAlert aria-hidden="true" size={15} /> Potential figures stay labelled until an outcome is recorded.</p>
     </div>
   )
 }

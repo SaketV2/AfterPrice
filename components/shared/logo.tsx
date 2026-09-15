@@ -17,7 +17,7 @@ export function BrandMark({ className, title = "AfterPrice", decorative = false 
 }
 
 export function Wordmark({ className }: { className?: string }) {
-  return <span className={cn("font-editorial text-[1.45rem] leading-none tracking-[-0.045em]", className)}>AfterPrice</span>;
+  return <span className={cn("text-[1.2rem] font-bold leading-none tracking-[-0.035em]", className)}>AfterPrice</span>;
 }
 
 export function Logo({ href = "/", className, label = true }: { href?: string; className?: string; label?: boolean }) {
