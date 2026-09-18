@@ -5,7 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
-  const next = safeAppPath(url.searchParams.get('next') === '/reset-password' ? '/app' : url.searchParams.get('next'))
+  const requestedNext = url.searchParams.get('next') === '/reset-password' ? '/app' : url.searchParams.get('next')
+  const next = safeAppPath(requestedNext)
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)

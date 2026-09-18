@@ -10,7 +10,9 @@ import styles from './marketing.module.css'
 type Mode = 'login' | 'signup' | 'forgot' | 'reset'
 const initialState: AuthState = {}
 
-export function AuthForm({ mode, next = '/app' }: { mode: Mode; next?: string }) {
+export type CheckoutClaim = { sessionId: string; claimToken: string }
+
+export function AuthForm({ mode, next = '/app', checkoutClaim }: { mode: Mode; next?: string; checkoutClaim?: CheckoutClaim }) {
   const action = mode === 'login' ? login : mode === 'signup' ? signup : mode === 'forgot' ? requestPasswordReset : updatePassword
   const [state, formAction, pending] = useActionState(action, initialState)
   const title = { login: 'Open your change ledger.', signup: 'Make the change visible.', forgot: 'Reset your password.', reset: 'Choose a new password.' }[mode]
@@ -22,6 +24,7 @@ export function AuthForm({ mode, next = '/app' }: { mode: Mode; next?: string })
     <p className={styles.authCardDescription}>{description}</p>
     <form action={formAction} className={styles.authForm}>
       <input type="hidden" name="next" value={next} />
+      {checkoutClaim && <><input type="hidden" name="checkout_session_id" value={checkoutClaim.sessionId} /><input type="hidden" name="checkout_claim_token" value={checkoutClaim.claimToken} /></>}
       <div className={styles.authFormFields}>
         {mode === 'signup' && <AuthField label="Name" name="name" autoComplete="name" placeholder="Your name" />}
         {mode !== 'reset' && <AuthField label="Email" name="email" type="email" autoComplete="email" placeholder="name@example.com" />}
@@ -32,7 +35,7 @@ export function AuthForm({ mode, next = '/app' }: { mode: Mode; next?: string })
       <button type="submit" disabled={pending} className={styles.authSubmit}>{pending ? 'Please wait…' : mode === 'login' ? 'Log in' : mode === 'signup' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Update password'} <ArrowUpRight aria-hidden="true" size={17} /></button>
     </form>
     {mode === 'login' && <p className={styles.authCenteredNote}><Link href="/forgot-password" className={styles.authLink}>Forgot password?</Link></p>}
-    {(mode === 'login' || mode === 'signup') && <p className={[styles.authCenteredNote, styles.authMuted].join(' ')}>{mode === 'login' ? 'Need an account?' : 'Already have an account?'} <Link href={mode === 'login' ? '/signup' : '/login'} className={styles.authLink}>{mode === 'login' ? 'Sign up' : 'Log in'}</Link></p>}
+    {(mode === 'login' || mode === 'signup') && <p className={[styles.authCenteredNote, styles.authMuted].join(' ')}>{mode === 'login' ? 'Need an account?' : 'Already have an account?'} <Link href={mode === 'login' && checkoutClaim ? `/login?next=${encodeURIComponent(`/app?checkout=claim&session_id=${checkoutClaim.sessionId}`)}` : mode === 'login' ? '/signup' : checkoutClaim ? `/login?checkout=success&session_id=${checkoutClaim.sessionId}` : '/login'} className={styles.authLink}>{mode === 'login' ? 'Sign up' : 'Log in'}</Link></p>}
     {mode === 'forgot' && <p className={styles.authCenteredNote}><Link href="/login" className={styles.authLink}>Back to login</Link></p>}
   </div>
 }

@@ -3,10 +3,10 @@ import { MarketingFooter, MarketingHeader, MarketingShell } from '@/components/m
 import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
-  title: { default: 'Stop losing money after you buy', template: '%s | AfterPrice' },
+  title: { default: 'See what changes after checkout', template: '%s | AfterPrice' },
   description: 'AfterPrice keeps a record of what you paid, shows what changed and gives you the evidence and timing to decide what to do next.',
   applicationName: 'AfterPrice',
-  openGraph: { title: 'AfterPrice | Stop losing money after you buy', description: 'Keep a record of price drops, plan changes and more expensive renewals after you buy.', type: 'website' },
+  openGraph: { title: 'AfterPrice | See what changes after checkout', description: 'Keep a record of price drops, plan changes and more expensive renewals after you buy.', type: 'website' },
 }
 
 export default async function MarketingLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -40,7 +40,7 @@ export const liveChanges: ChangeRecord[] = [
     statusTone: 'positive',
     baseline: '$349',
     current: '$299',
-    difference: 'Potential $50 claim',
+    difference: 'Potential $50 difference',
     observed: '06 Sep 2026, 11:42 AM',
     deadline: '4 days remaining',
     summary: 'The same model is listed $50 below the saved purchase price.',
@@ -88,7 +88,7 @@ export const liveChanges: ChangeRecord[] = [
     summary: 'The next renewal is $15 more per month than the saved price.',
     evidence: [
       { label: 'Saved baseline', value: 'Invoice · 10 Sep 2025' },
-      { label: 'Latest source', value: 'Renewal notice in demo inbox' },
+      { label: 'Latest source', value: 'Provider renewal notice' },
       { label: 'Source status', value: 'Available · date confirmed' },
     ],
     action: 'Check alternatives before renewal',
@@ -182,9 +182,9 @@ export const changeTypes = [
 ]
 
 export const capabilityRows = [
-  ['Save a purchase or subscription baseline', 'Available in demo'],
-  ['Compare illustrative price, plan and renewal records', 'Available in demo'],
-  ['Show source, observed time and a next action', 'Available in demo'],
+  ['Save a purchase or subscription baseline', 'Available in V1'],
+  ['Compare price, plan and renewal records', 'Available in V1'],
+  ['Show source, observed time and a next action', 'Available in V1'],
   ['Automatically check every retailer', 'Not supported in V1'],
   ['Submit a claim, cancel a service or guarantee a refund', 'Not supported in V1'],
 ]
@@ -211,7 +211,7 @@ export const faqItems = [
   },
   {
     question: 'What remains manual?',
-    answer: 'Retailer checks without a supported source, claim submission, subscription cancellation and payments remain manual in this V1. Account authentication is real.',
+    answer: 'Retailer checks without a supported source, claim submission and subscription cancellation remain manual in this V1. Pro billing runs through Stripe-hosted Checkout, while account authentication and access updates remain server-controlled.',
   },
 ]
 

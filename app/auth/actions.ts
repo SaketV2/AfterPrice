@@ -4,10 +4,19 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { safeAppPath } from '@/lib/auth/redirects'
+import { CHECKOUT_SESSION_ID_PATTERN, CLAIM_TOKEN_PATTERN } from '@/lib/billing/validation'
 import { createClient } from '@/lib/supabase/server'
 
 export type AuthState = { error?: string; message?: string }
 const credentials = z.object({ email: z.string().email(), password: z.string().min(8).max(128) })
+const checkoutSessionId = z.string().regex(CHECKOUT_SESSION_ID_PATTERN)
+const checkoutClaimToken = z.string().regex(CLAIM_TOKEN_PATTERN)
+
+function getCheckoutClaim(formData: FormData) {
+  const sessionId = checkoutSessionId.safeParse(formData.get('checkout_session_id'))
+  const claimToken = checkoutClaimToken.safeParse(formData.get('checkout_claim_token'))
+  return sessionId.success && claimToken.success ? { sessionId: sessionId.data, claimToken: claimToken.data } : null
+}
 
 export async function login(_: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = credentials.safeParse({ email: formData.get('email'), password: formData.get('password') })
@@ -16,7 +25,8 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
   const { error } = await supabase.auth.signInWithPassword(parsed.data)
   if (error) return { error: 'Those details were not accepted. Check your email and password.' }
   revalidatePath('/', 'layout')
-  redirect(safeAppPath(formData.get('next')))
+  const claim = getCheckoutClaim(formData)
+  redirect(claim ? `/app?checkout=claim&session_id=${encodeURIComponent(claim.sessionId)}&claim_token=${encodeURIComponent(claim.claimToken)}` : safeAppPath(formData.get('next')))
 }
 
 export async function signup(_: AuthState, formData: FormData): Promise<AuthState> {
@@ -24,12 +34,14 @@ export async function signup(_: AuthState, formData: FormData): Promise<AuthStat
   if (!parsed.success) return { error: 'Enter your name, a valid email and a password of at least 8 characters.' }
   const supabase = await createClient()
   const next = safeAppPath(formData.get('next'))
+  const claim = getCheckoutClaim(formData)
+  const signupNext = claim ? `/app?checkout=claim&session_id=${encodeURIComponent(claim.sessionId)}&claim_token=${encodeURIComponent(claim.claimToken)}` : next
   const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-  const { data, error } = await supabase.auth.signUp({ email: parsed.data.email, password: parsed.data.password, options: { data: { display_name: parsed.data.name }, emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` } })
+  const { data, error } = await supabase.auth.signUp({ email: parsed.data.email, password: parsed.data.password, options: { data: { display_name: parsed.data.name }, emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(signupNext)}` } })
   if (error) return { error: error.message }
-  if (!data.session) return { message: 'Check your email to confirm your account, then log in.' }
+  if (!data.session) return { message: claim ? 'Payment is recorded. Check your email to confirm your account, then return here to finish setup.' : 'Check your email to confirm your account, then log in.' }
   revalidatePath('/', 'layout')
-  redirect(next)
+  redirect(signupNext)
 }
 
 export async function logout() {

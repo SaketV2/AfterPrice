@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Bell, CirclePlus, LayoutDashboard, LogOut, Menu, Settings, ShoppingBag, WalletCards, X } from 'lucide-react'
 import { logout } from '@/app/auth/actions'
 import { Logo as SharedLogo } from '@/components/shared/logo'
+import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { EmptyState as LifecycleEmptyState } from '@/components/shared/empty-state'
 
 const navItems = [
@@ -21,45 +22,167 @@ function Logo() {
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
-  return <nav className="space-y-1" aria-label="Application navigation">{navItems.map(({ href, label, icon: Icon }) => { const active = href === '/app' ? pathname === '/app' : pathname.startsWith(href); return <Link key={href} href={href} onClick={onNavigate} aria-current={active ? 'page' : undefined} className={`group flex min-h-11 items-center gap-3 rounded-input px-3 text-sm font-semibold transition-colors focus-visible:outline-none ${active ? 'bg-[hsl(var(--surface-dark))] text-[hsl(var(--foreground-on-dark))] shadow-sm' : 'text-[hsl(var(--foreground-secondary))] hover:bg-[hsl(var(--surface-subtle))] hover:text-foreground'}`}><span className={`grid h-8 w-8 place-items-center rounded-lg ${active ? 'bg-[hsl(var(--signal-lime))] text-[hsl(var(--signal-lime-ink))]' : 'text-[hsl(var(--foreground-muted))] group-hover:text-accent'}`} aria-hidden="true"><Icon className="h-[17px] w-[17px]" /></span>{label}</Link> })}<Link href="/app/add" onClick={onNavigate} className="mt-5 flex min-h-11 items-center gap-3 rounded-input bg-[hsl(var(--surface-dark))] px-3 text-sm font-semibold text-[hsl(var(--foreground-on-dark))] transition-colors hover:bg-[hsl(var(--surface-dark-raised))] focus-visible:outline-none"><span className="grid h-8 w-8 place-items-center rounded-lg bg-[hsl(var(--signal-lime))] text-[hsl(var(--signal-lime-ink))]" aria-hidden="true"><CirclePlus className="h-[17px] w-[17px]" /></span>Add item</Link></nav>
+
+  return (
+    <nav className="space-y-1" aria-label="Application navigation">
+      {navItems.map(({ href, label, icon: Icon }) => {
+        const active = href === '/app' ? pathname === '/app' : pathname.startsWith(href)
+        return (
+          <Link
+            key={href}
+            href={href}
+            onClick={onNavigate}
+            aria-current={active ? 'page' : undefined}
+            className={`group flex min-h-11 items-center gap-3 rounded-input px-3 text-sm font-semibold transition-colors focus-visible:outline-none ${active ? 'bg-[hsl(var(--accent-soft))] text-foreground' : 'text-[hsl(var(--foreground-secondary))] hover:bg-[hsl(var(--surface-subtle))] hover:text-foreground'}`}
+          >
+            <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg transition-colors ${active ? 'bg-accent text-[hsl(var(--accent-foreground))]' : 'text-[hsl(var(--foreground-muted))] group-hover:bg-[hsl(var(--surface-cool))] group-hover:text-accent'}`} aria-hidden="true">
+              <Icon className="h-[17px] w-[17px]" />
+            </span>
+            <span className="truncate">{label}</span>
+          </Link>
+        )
+      })}
+      <Link
+        href="/app/add"
+        onClick={onNavigate}
+        className="mt-5 flex min-h-11 items-center gap-3 rounded-input bg-accent px-3 text-sm font-semibold text-[hsl(var(--accent-foreground))] transition-colors hover:bg-[hsl(var(--accent-hover))] focus-visible:outline-none"
+      >
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/15" aria-hidden="true">
+          <CirclePlus className="h-[17px] w-[17px]" />
+        </span>
+        <span>Add item</span>
+      </Link>
+    </nav>
+  )
 }
 
 function Account({ user }: { user: { name: string; email: string } }) {
   const initials = user.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase() || 'AP'
-  return <div className="border-t border-border pt-4"><Link href="/app/settings" className="flex items-center gap-3 rounded-input px-2.5 py-2.5 transition-colors hover:bg-[hsl(var(--surface-subtle))]"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[hsl(var(--surface-dark))] text-xs font-bold text-[hsl(var(--foreground-on-dark))]">{initials}</span><span className="min-w-0"><span className="block truncate text-sm font-semibold">{user.name}</span><span className="block truncate text-xs text-[hsl(var(--foreground-secondary))]">{user.email}</span></span></Link><form action={logout}><button type="submit" className="mt-2 flex min-h-11 w-full items-center gap-3 rounded-input px-3 text-sm font-semibold text-[hsl(var(--foreground-secondary))] transition-colors hover:bg-[hsl(var(--surface-subtle))] hover:text-[hsl(var(--danger))]"><LogOut className="h-4 w-4" aria-hidden="true" />Log out</button></form></div>
+
+  return (
+    <div className="border-t border-border pt-4">
+      <Link href="/app/settings" className="flex min-w-0 items-center gap-3 rounded-input px-2.5 py-2.5 transition-colors hover:bg-[hsl(var(--surface-subtle))]">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[hsl(var(--surface-dark))] text-xs font-bold text-[hsl(var(--foreground-on-dark))]">{initials}</span>
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-semibold">{user.name}</span>
+          <span className="block truncate text-xs text-[hsl(var(--foreground-secondary))]">{user.email}</span>
+        </span>
+      </Link>
+      <form action={logout}>
+        <button type="submit" className="mt-2 flex min-h-11 w-full items-center gap-3 rounded-input px-3 text-sm font-semibold text-[hsl(var(--foreground-secondary))] transition-colors hover:bg-[hsl(var(--danger-soft))] hover:text-[hsl(var(--danger))]">
+          <LogOut className="h-4 w-4" aria-hidden="true" />
+          Log out
+        </button>
+      </form>
+    </div>
+  )
 }
 
 export function ProductShell({ children, user }: { children: ReactNode; user: { name: string; email: string } }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const pageTitle = pathname === '/app' ? 'Inbox' : pathname.startsWith('/app/purchases') ? 'Purchases' : pathname.startsWith('/app/subscriptions') ? 'Subscriptions' : pathname.startsWith('/app/alerts') ? 'Changes' : pathname.startsWith('/app/add') || pathname.startsWith('/app/baselines/new') ? 'Add item' : pathname.startsWith('/app/settings') ? 'Settings' : 'AfterPrice'
+
+  const closeMobileNavigation = useCallback(() => {
+    setMobileOpen(false)
+    window.requestAnimationFrame(() => menuButtonRef.current?.focus())
+  }, [])
 
   useEffect(() => {
     if (!mobileOpen) return
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setMobileOpen(false) }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeMobileNavigation()
+    }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [mobileOpen])
+  }, [closeMobileNavigation, mobileOpen])
 
-  return <div className="min-h-screen bg-background text-foreground">
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-[256px] flex-col border-r border-border bg-surface px-5 py-6 lg:flex"><Logo /><div className="mt-11 flex-1"><div className="mb-3 flex items-center gap-2 px-3"><span className="h-px w-5 bg-[hsl(var(--signal-lime))]" aria-hidden="true" /><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--foreground-muted))]">Monitor</p></div><NavLinks /></div><Account user={user} /></aside>
-    {mobileOpen && <button type="button" aria-label="Close navigation" onClick={() => setMobileOpen(false)} className="fixed inset-0 z-40 bg-[hsl(var(--surface-dark)/.35)] lg:hidden" />}
-    <aside role="dialog" aria-modal="true" aria-hidden={!mobileOpen} aria-label="Application navigation" className={`fixed inset-y-0 left-0 z-50 flex w-[288px] flex-col bg-surface px-5 py-6 shadow-[var(--shadow-raised)] transition-transform duration-200 lg:hidden ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}><div className="flex items-center justify-between"><Logo /><button type="button" onClick={() => setMobileOpen(false)} aria-label="Close navigation" className="grid h-11 w-11 place-items-center rounded-input text-[hsl(var(--foreground-secondary))] hover:bg-[hsl(var(--surface-subtle))]"><X className="h-5 w-5" /></button></div><div className="mt-10 flex-1"><div className="mb-3 flex items-center gap-2 px-3"><span className="h-px w-5 bg-[hsl(var(--signal-lime))]" aria-hidden="true" /><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--foreground-muted))]">Monitor</p></div><NavLinks onNavigate={() => setMobileOpen(false)} /></div><Account user={user} /></aside>
-    <div className="lg:pl-[256px]"><header className="sticky top-0 z-20 border-b border-border bg-[hsl(var(--background)/.94)] backdrop-blur"><div className="flex min-h-[72px] items-center justify-between gap-4 px-5 sm:px-8 xl:px-12"><div className="flex items-center gap-3"><button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation" className="grid h-11 w-11 items-center justify-center rounded-input border border-border bg-surface text-[hsl(var(--foreground-secondary))] lg:hidden"><Menu className="h-5 w-5" /></button><div><p className="hidden text-xs text-[hsl(var(--foreground-muted))] sm:block">AfterPrice / Monitor</p><h1 className="font-sans text-lg font-extrabold tracking-[-0.025em]">{pageTitle}</h1></div></div><div className="flex items-center gap-2"><Link href="/app/alerts" aria-label="Open alerts" className="relative grid h-10 w-10 place-items-center rounded-input border border-border bg-surface text-[hsl(var(--foreground-secondary))] transition-colors hover:bg-[hsl(var(--surface-subtle))]"><Bell className="h-4 w-4" /></Link><Link href="/app/add" className="hidden min-h-11 items-center gap-2 rounded-input bg-[hsl(var(--surface-dark))] px-4 text-sm font-bold text-[hsl(var(--foreground-on-dark))] transition-colors hover:bg-[hsl(var(--surface-dark-raised))] sm:inline-flex"><CirclePlus className="h-4 w-4" />Add item</Link><Link href="/app/settings" aria-label="Account settings" className="grid h-10 w-10 place-items-center rounded-full bg-[hsl(var(--surface-dark))] text-[hsl(var(--foreground-on-dark))]"><Settings className="h-4 w-4" /></Link></div></div></header><main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1440px] px-5 py-8 outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-8 sm:py-10 xl:px-12">{children}</main></div>
-  </div>
+  return (
+    <div className="product-app min-h-screen bg-background text-foreground">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[256px] flex-col border-r border-border bg-surface px-5 py-6 lg:flex">
+        <Logo />
+        <div className="mt-11 flex min-h-0 flex-1 flex-col">
+          <div className="mb-3 flex items-center gap-2 px-3">
+            <span className="h-px w-5 bg-accent" aria-hidden="true" />
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--foreground-muted))]">Monitor</p>
+          </div>
+          <NavLinks />
+        </div>
+        <Account user={user} />
+      </aside>
+
+      {mobileOpen && <button type="button" aria-label="Close navigation" onClick={closeMobileNavigation} className="fixed inset-0 z-40 bg-[hsl(var(--surface-dark)/.45)] lg:hidden" />}
+      <aside
+        id="mobile-navigation"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={!mobileOpen}
+        aria-label="Application navigation"
+        className={`fixed inset-y-0 left-0 z-50 flex w-[calc(100vw-1rem)] max-w-[288px] flex-col border-r border-border bg-surface px-5 py-6 shadow-[var(--shadow-raised)] transition-transform duration-200 lg:hidden ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        <div className="flex items-center justify-between gap-4">
+          <Logo />
+          <button type="button" onClick={closeMobileNavigation} aria-label="Close navigation" className="grid h-11 w-11 shrink-0 place-items-center rounded-input text-[hsl(var(--foreground-secondary))] hover:bg-[hsl(var(--surface-subtle))]">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <div className="mt-10 flex min-h-0 flex-1 flex-col">
+          <div className="mb-3 flex items-center gap-2 px-3">
+            <span className="h-px w-5 bg-accent" aria-hidden="true" />
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--foreground-muted))]">Monitor</p>
+          </div>
+          <NavLinks onNavigate={closeMobileNavigation} />
+        </div>
+        <Account user={user} />
+      </aside>
+
+      <div className="min-w-0 lg:pl-[256px]">
+        <header className="sticky top-0 z-20 border-b border-border bg-background/94 backdrop-blur">
+          <div className="flex min-h-[72px] items-center justify-between gap-4 px-5 sm:px-8 xl:px-12">
+            <div className="flex min-w-0 items-center gap-3">
+              <button ref={menuButtonRef} type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation" aria-controls="mobile-navigation" aria-expanded={mobileOpen} className="grid h-11 w-11 shrink-0 place-items-center rounded-input border border-border bg-surface text-[hsl(var(--foreground-secondary))] lg:hidden">
+                <Menu className="h-5 w-5" />
+              </button>
+              <div className="min-w-0">
+                <p className="hidden text-xs text-[hsl(var(--foreground-muted))] sm:block">AfterPrice / Monitor</p>
+                <h1 className="truncate font-sans text-lg font-extrabold tracking-[-0.025em]">{pageTitle}</h1>
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <ThemeToggle />
+              <Link href="/app/alerts" aria-label="Open alerts" className="relative grid h-11 w-11 place-items-center rounded-input border border-border bg-surface text-[hsl(var(--foreground-secondary))] transition-colors hover:bg-[hsl(var(--surface-subtle))]">
+                <Bell className="h-4 w-4" />
+              </Link>
+              <Link href="/app/add" className="hidden min-h-11 items-center gap-2 rounded-input bg-accent px-4 text-sm font-bold text-[hsl(var(--accent-foreground))] transition-colors hover:bg-[hsl(var(--accent-hover))] sm:inline-flex">
+                <CirclePlus className="h-4 w-4" />
+                Add item
+              </Link>
+              <Link href="/app/settings" aria-label="Account settings" className="grid h-11 w-11 place-items-center rounded-full bg-[hsl(var(--surface-dark))] text-[hsl(var(--foreground-on-dark))] transition-colors hover:bg-[hsl(var(--surface-dark-raised))]">
+                <Settings className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </header>
+        <main id="main-content" tabIndex={-1} className="mx-auto min-h-[calc(100vh-4.5rem)] w-full max-w-[1440px] overflow-x-clip px-5 py-8 outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-8 sm:py-10 xl:px-12">
+          {children}
+        </main>
+      </div>
+    </div>
+  )
 }
 
 export function PageIntro({ title, description, action }: { title: string; description?: string; action?: ReactNode }) {
-  return <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-center"><div><h2 className="max-w-3xl font-sans text-3xl font-extrabold leading-tight tracking-[-0.035em] sm:text-4xl">{title}</h2>{description && <p className="mt-3 max-w-2xl text-sm leading-6 text-[hsl(var(--foreground-secondary))] sm:text-base">{description}</p>}</div>{action}</div>
+  return <div className="mb-8 flex min-w-0 flex-col justify-between gap-5 sm:flex-row sm:items-center"><div className="min-w-0"><h2 className="max-w-3xl font-sans text-3xl font-extrabold leading-tight tracking-[-0.035em] sm:text-4xl">{title}</h2>{description && <p className="mt-3 max-w-2xl text-sm leading-6 text-[hsl(var(--foreground-secondary))] sm:text-base">{description}</p>}</div>{action}</div>
 }
 
 export function Panel({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-card border border-border bg-surface p-5 shadow-soft sm:p-6 ${className}`}>{children}</section>
+  return <section className={`min-w-0 rounded-card border border-border bg-surface p-5 shadow-soft sm:p-6 ${className}`}>{children}</section>
 }
 
 export function StatusBadge({ children, tone = 'neutral' }: { children: ReactNode; tone?: 'neutral' | 'accent' | 'success' | 'warning' | 'danger' }) {
-  const tones = { neutral: 'bg-[hsl(var(--surface-subtle))] text-[hsl(var(--foreground-secondary))]', accent: 'bg-[hsl(var(--accent-soft))] text-accent', success: 'bg-[hsl(var(--success-soft))] text-[hsl(var(--success))]', warning: 'bg-[hsl(var(--warning-soft))] text-[hsl(var(--warning))]', danger: 'bg-[hsl(var(--danger-soft))] text-[hsl(var(--danger))]' }
-  return <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${tones[tone]}`}><span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />{children}</span>
+  const tones = { neutral: 'bg-[hsl(var(--neutral-soft))] text-[hsl(var(--neutral))]', accent: 'bg-[hsl(var(--info-soft))] text-[hsl(var(--info))]', success: 'bg-[hsl(var(--success-soft))] text-[hsl(var(--success))]', warning: 'bg-[hsl(var(--warning-soft))] text-[hsl(var(--warning))]', danger: 'bg-[hsl(var(--danger-soft))] text-[hsl(var(--danger))]' }
+  return <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${tones[tone]}`}><span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />{children}</span>
 }
 
 export function EmptyState({ title, description, action, className = '' }: { title: string; description: string; action?: ReactNode; className?: string }) {

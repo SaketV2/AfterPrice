@@ -58,7 +58,7 @@ export function MobileNav({ authenticated = false }: { authenticated?: boolean }
     }
   }, [open])
 
-  const links = [['What it catches', '/#catches'], ['How it works', '/#lifecycle'], ['Coverage', '/#coverage'], ['Data & privacy', '/#data'], ['Pricing', '/pricing']]
+  const links = [['How it works', '/how-it-works'], ['Coverage', '/coverage'], ['Data & privacy', '/data-privacy'], ['Pricing', '/pricing']]
 
   return <>
     <button ref={menuButtonRef} type="button" aria-label="Open navigation" aria-haspopup="dialog" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(true)} className={styles.mobileMenuButton}><Menu aria-hidden="true" size={20} /></button>
@@ -66,8 +66,9 @@ export function MobileNav({ authenticated = false }: { authenticated?: boolean }
       <div className={styles.navigationPanel}>
         <div className="mb-4 flex items-center justify-between gap-4"><Wordmark /><button type="button" onClick={() => setOpen(false)} aria-label="Close navigation" className={styles.mobileMenuButton}><X aria-hidden="true" size={20} /></button></div>
         <nav aria-label="Mobile primary navigation" className="flex flex-col gap-1">
-          {links.map(([label, href]) => { const active = !href.includes('#') && pathname === href; return <Link key={href} href={href} aria-current={active ? 'page' : undefined} onClick={() => setOpen(false)} className={[styles.mobileNavLink, active ? styles.mobileNavLinkActive : ''].join(' ')}>{label}</Link> })}
+          {links.map(([label, href]) => { const active = pathname === href; return <Link key={href} href={href} aria-current={active ? 'page' : undefined} onClick={() => setOpen(false)} className={[styles.mobileNavLink, active ? styles.mobileNavLinkActive : ''].join(' ')}>{label}</Link> })}
           <div className={styles.mobileNavDivider} />
+          <ButtonLink href="/demo" variant="secondary" onClick={() => setOpen(false)}>View sample <ArrowUpRightIcon /></ButtonLink>
           {authenticated ? <ButtonLink href="/app" onClick={() => setOpen(false)}>Open app <ArrowUpRightIcon /></ButtonLink> : <><Link href="/login" aria-current={pathname === '/login' ? 'page' : undefined} onClick={() => setOpen(false)} className={styles.mobileNavLink}>Log in</Link><ButtonLink href="/signup" onClick={() => setOpen(false)}>Get started <ArrowUpRightIcon /></ButtonLink></>}
         </nav>
         <p className={styles.mobileNavNote}>Add only the purchases and subscriptions you choose. No bank connection.</p>

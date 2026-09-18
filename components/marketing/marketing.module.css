@@ -600,6 +600,13 @@
 .pricingPlanFeatured .pricingFeature svg { color: var(--saffron); }
 .pricingPlanFeatured .pricingFeature { color: rgba(255, 253, 248, 0.86); }
 .pricingFootnote { max-width: 40rem; margin: 1.5rem auto 0; color: var(--muted-ink); font-size: 0.72rem; line-height: 1.5; text-align: center; }
+.checkoutAction { display: grid; gap: 0.75rem; margin-top: auto; }
+.checkoutEmail { display: grid; gap: 0.4rem; color: rgba(255, 253, 248, 0.82); font-size: 0.68rem; line-height: 1.4; }
+.checkoutEmail small { color: rgba(255, 253, 248, 0.56); font-size: inherit; }
+.checkoutEmail input { width: 100%; min-height: 2.75rem; border: 1px solid rgba(255, 253, 248, 0.25); border-radius: 8px; background: rgba(255, 253, 248, 0.08); padding: 0.65rem 0.75rem; color: var(--paper-raised); font-size: 0.8rem; outline: none; }
+.checkoutEmail input::placeholder { color: rgba(255, 253, 248, 0.45); }
+.checkoutEmail input:focus { border-color: var(--saffron); box-shadow: 0 0 0 3px rgba(215, 169, 66, 0.24); }
+.checkoutError { border: 1px solid rgba(255, 157, 136, 0.55); background: rgba(129, 48, 33, 0.35); padding: 0.55rem 0.65rem; color: #ffd5cc; font-size: 0.7rem; line-height: 1.4; }
 .pricingBoundary { border-block: 1px solid var(--line); background: var(--paper-raised); padding-block: 5rem; }
 .pricingBoundary h2 { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.035em; line-height: 1; text-align: center; }
 .pricingBoundary p { max-width: 38rem; margin: 1rem auto 0; color: var(--muted-ink); font-size: 0.95rem; line-height: 1.6; text-align: center; }
@@ -705,4 +712,82 @@
   .marketingRoot *::before,
   .marketingRoot *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .buttonBase:hover { transform: none; }
+}
+
+/* Homepage and dedicated information surfaces */
+.marketingRoot a:focus-visible,
+.marketingRoot button:focus-visible,
+.marketingRoot input:focus-visible { outline: 3px solid var(--saffron); outline-offset: 3px; }
+
+.heroSection { background: var(--paper); }
+.heroGrid { gap: clamp(2rem, 5vw, 5rem); padding-block: clamp(3rem, 7vw, 5.5rem) clamp(3.75rem, 8vw, 6.5rem); }
+.heroCopy h1 { max-width: 10ch; }
+.heroCopy > p { max-width: 34rem; }
+.heroRecordStage { min-height: 34rem; }
+
+.explanationSection { border-bottom: 1px solid var(--line); background: var(--paper-raised); padding-block: clamp(4rem, 8vw, 7rem); }
+.explanationIntro { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(18rem, 0.8fr); align-items: end; gap: clamp(2rem, 7vw, 7rem); border-bottom: 1px solid var(--line); padding-bottom: 2.75rem; }
+.explanationIntro h2 { max-width: 12ch; font-size: clamp(2.4rem, 5vw, 4.6rem); letter-spacing: -0.04em; line-height: 0.97; }
+.explanationIntro p { max-width: 34rem; color: var(--muted-ink); font-size: 1rem; line-height: 1.65; }
+.explanationList { border-bottom: 1px solid var(--line); }
+.explanationRow { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 1.5rem; padding-block: 1.6rem; }
+.explanationRow + .explanationRow { border-top: 1px solid var(--line); }
+.explanationRow > span { color: var(--saffron); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; }
+.explanationRow h3 { font-size: clamp(1.15rem, 2vw, 1.45rem); letter-spacing: -0.03em; }
+.explanationRow p { max-width: 42rem; margin-top: 0.4rem; color: var(--muted-ink); font-size: 0.88rem; line-height: 1.6; }
+.explanationLink { display: flex; justify-content: flex-end; margin-top: 1.35rem; }
+
+.compactInfoSection { border-bottom: 1px solid var(--line); background: var(--paper); padding-block: clamp(3.5rem, 7vw, 5.5rem); }
+.compactInfoGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.compactInfoBlock { min-width: 0; padding: 0 clamp(1.25rem, 3vw, 2.75rem); }
+.compactInfoBlock + .compactInfoBlock { border-left: 1px solid var(--line); }
+.compactInfoBlock:first-child { padding-left: 0; }
+.compactInfoBlock:last-child { padding-right: 0; }
+.compactInfoBlock h2 { font-size: 1.25rem; letter-spacing: -0.03em; }
+.compactInfoBlock p { max-width: 25rem; margin-top: 0.8rem; color: var(--muted-ink); font-size: 0.86rem; line-height: 1.6; }
+.compactList { display: grid; gap: 0.55rem; margin-top: 1rem; color: var(--muted-ink); font-size: 0.86rem; line-height: 1.45; }
+.compactList li { display: flex; gap: 0.55rem; }
+.compactList li::before { color: var(--saffron); content: '—'; font-weight: 800; }
+.compactInfoBlock .buttonBase { margin-top: 1.15rem; padding-inline: 0; }
+
+.contentHero { border-bottom: 1px solid var(--line); background: var(--sage); padding-block: clamp(4rem, 8vw, 7rem); }
+.contentHero h1 { max-width: 11ch; font-size: clamp(3rem, 7vw, 6rem); font-weight: 760; letter-spacing: -0.04em; line-height: 0.95; }
+.contentHero > div > p { max-width: 42rem; margin-top: 1.5rem; color: var(--moss); font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.6; }
+.detailSection { border-bottom: 1px solid var(--line); background: var(--paper-raised); padding-block: clamp(4rem, 8vw, 6.5rem); }
+.detailGrid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(2rem, 7vw, 7rem); }
+.detailGrid h2 { max-width: 11ch; font-size: clamp(2.25rem, 4vw, 4rem); letter-spacing: -0.04em; line-height: 0.98; }
+.detailGrid > div > p { max-width: 24rem; margin-top: 1rem; color: var(--muted-ink); font-size: 0.95rem; line-height: 1.6; }
+.detailGrid .coverageList { margin-top: 0; }
+
+.privacyPage { padding-block: clamp(4rem, 8vw, 7rem); }
+.privacyIntro { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(18rem, 0.8fr); align-items: end; gap: clamp(2rem, 7vw, 7rem); border-bottom: 1px solid var(--line); padding-bottom: 3rem; }
+.privacyIntro h1 { max-width: 10ch; font-size: clamp(3rem, 7vw, 6rem); letter-spacing: -0.04em; line-height: 0.95; }
+.privacyIntro p { max-width: 35rem; color: var(--muted-ink); font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.6; }
+.privacyGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+.privacyGrid section { padding: 2rem 2rem 2rem 0; }
+.privacyGrid section:nth-child(even) { border-left: 1px solid var(--line); padding-inline: 2rem 0; }
+.privacyGrid section:nth-child(n + 3) { border-top: 1px solid var(--line); }
+.privacyGrid h2 { font-size: 1.15rem; letter-spacing: -0.03em; }
+.privacyGrid p { max-width: 32rem; margin-top: 0.65rem; color: var(--muted-ink); font-size: 0.9rem; line-height: 1.65; }
+
+@media (max-width: 767px) {
+  .heroGrid { gap: 1.5rem; }
+  .heroRecordStage { min-height: 32rem; }
+  .explanationIntro,
+  .privacyIntro,
+  .detailGrid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .explanationIntro { padding-bottom: 2rem; }
+  .explanationRow { grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.75rem; }
+  .compactInfoGrid { grid-template-columns: 1fr; gap: 0; }
+  .compactInfoBlock,
+  .compactInfoBlock:first-child,
+  .compactInfoBlock:last-child { padding: 1.5rem 0; }
+  .compactInfoBlock + .compactInfoBlock { border-top: 1px solid var(--line); border-left: 0; }
+  .compactInfoBlock:first-child { padding-top: 0; }
+  .compactInfoBlock:last-child { padding-bottom: 0; }
+  .privacyGrid { grid-template-columns: 1fr; }
+  .privacyGrid section,
+  .privacyGrid section:nth-child(even) { padding: 1.5rem 0; }
+  .privacyGrid section:nth-child(even) { border-left: 0; }
+  .privacyGrid section:nth-child(n + 2) { border-top: 1px solid var(--line); }
 }

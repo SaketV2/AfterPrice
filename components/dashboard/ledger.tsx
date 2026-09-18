@@ -45,7 +45,7 @@ const stateOrder: Array<{ key: LedgerState; label: string; description: string }
 ]
 
 const stateStyles: Record<LedgerState, { dot: string; badge: string }> = {
-  action: { dot: 'bg-[hsl(var(--signal-lime))]', badge: 'bg-[hsl(var(--signal-lime-soft))] text-[hsl(var(--signal-lime-ink))]' },
+  action: { dot: 'bg-[hsl(var(--info))]', badge: 'bg-[hsl(var(--info-soft))] text-[hsl(var(--info))]' },
   due: { dot: 'bg-[hsl(var(--warning))]', badge: 'bg-[hsl(var(--warning-soft))] text-[hsl(var(--warning))]' },
   changed: { dot: 'bg-[hsl(var(--danger))]', badge: 'bg-[hsl(var(--danger-soft))] text-[hsl(var(--danger))]' },
   watching: { dot: 'bg-[hsl(var(--foreground-muted))]', badge: 'bg-[hsl(var(--surface-subtle))] text-[hsl(var(--foreground-secondary))]' },
@@ -179,7 +179,7 @@ function StateBadge({ entry }: { entry: LedgerEntry }) {
 }
 
 function ValueCell({ label, value, detail, emphasis = false, tone = 'neutral' }: { label: string; value: string; detail: string; emphasis?: boolean; tone?: keyof typeof valueToneClasses }) {
-  return <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[hsl(var(--foreground-muted))]">{label}</p><p className="mt-1 text-sm font-bold leading-5 tabular-nums"><span className={emphasis ? 'inline-flex rounded-[5px] bg-[hsl(var(--success-soft))] px-1.5 py-0.5 text-[hsl(var(--success))]' : valueToneClasses[tone]}>{value}</span></p><p className="mt-1 line-clamp-2 text-xs leading-4 text-[hsl(var(--foreground-secondary))]">{detail}</p></div>
+  return <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[hsl(var(--foreground-muted))]">{label}</p><p className="mt-1 text-sm font-bold leading-5 tabular-nums"><span className={emphasis ? 'inline-flex rounded-[5px] bg-[hsl(var(--info-soft))] px-1.5 py-0.5 text-[hsl(var(--info))]' : valueToneClasses[tone]}>{value}</span></p><p className="mt-1 line-clamp-2 text-xs leading-4 text-[hsl(var(--foreground-secondary))]">{detail}</p></div>
 }
 
 function EvidenceCell({ entry }: { entry: LedgerEntry }) {
@@ -187,7 +187,7 @@ function EvidenceCell({ entry }: { entry: LedgerEntry }) {
 }
 
 function ActionLink({ entry }: { entry: LedgerEntry }) {
-  return <Link href={`/app/baselines/${entry.record.id}`} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-input bg-[hsl(var(--surface-dark))] px-3 text-sm font-bold text-[hsl(var(--foreground-on-dark))] transition-colors hover:bg-[hsl(var(--surface-dark-raised))] xl:w-auto xl:min-w-[142px]">{entry.nextAction}<ArrowRight className="h-4 w-4" /></Link>
+  return <Link href={`/app/baselines/${entry.record.id}`} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-input bg-accent px-3 text-sm font-bold text-[hsl(var(--accent-foreground))] transition-colors hover:bg-[hsl(var(--accent-hover))] xl:w-auto xl:min-w-[142px]">{entry.nextAction}<ArrowRight className="h-4 w-4" /></Link>
 }
 
 function recordMarkLabel(record: BaselineRecord) {
@@ -198,7 +198,7 @@ function recordMarkLabel(record: BaselineRecord) {
 
 function RecordMark({ entry }: { entry: LedgerEntry }) {
   const isPurchase = entry.record.baseline_type === 'purchase'
-  return <span className={`relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[11px] border ${isPurchase ? 'border-border bg-[hsl(var(--surface-subtle))] text-[hsl(var(--foreground-secondary))]' : 'border-[hsl(var(--signal-lime)/.55)] bg-[hsl(var(--signal-lime-soft))] text-[hsl(var(--signal-lime-ink))]'}`} aria-hidden="true"><svg viewBox="0 0 44 44" className="absolute inset-0 h-full w-full" fill="none"><path d={isPurchase ? 'M9 14.5h26M9 22h18M9 29.5h22' : 'M22 8v28M8 22h28'} stroke="currentColor" strokeOpacity=".18" strokeWidth="1.5" /><circle cx="34" cy="10" r="3" fill="currentColor" fillOpacity=".3" /></svg><span className="relative text-[10px] font-extrabold tracking-[0.08em]">{recordMarkLabel(entry.record)}</span></span>
+  return <span className={`relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[11px] border ${isPurchase ? 'border-border bg-[hsl(var(--surface-subtle))] text-[hsl(var(--foreground-secondary))]' : 'border-[hsl(var(--info)/.55)] bg-[hsl(var(--info-soft))] text-[hsl(var(--info))]'}`} aria-hidden="true"><svg viewBox="0 0 44 44" className="absolute inset-0 h-full w-full" fill="none"><path d={isPurchase ? 'M9 14.5h26M9 22h18M9 29.5h22' : 'M22 8v28M8 22h28'} stroke="currentColor" strokeOpacity=".18" strokeWidth="1.5" /><circle cx="34" cy="10" r="3" fill="currentColor" fillOpacity=".3" /></svg><span className="relative text-[10px] font-extrabold tracking-[0.08em]">{recordMarkLabel(entry.record)}</span></span>
 }
 
 function Identity({ entry, mobile = false }: { entry: LedgerEntry; mobile?: boolean }) {
@@ -230,7 +230,7 @@ export function Ledger({ entries, emptyTitle = 'Nothing to review yet', emptyDes
 }
 
 export function LedgerLegend() {
-  return <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[hsl(var(--foreground-secondary))]"><span className="inline-flex items-center gap-2"><CircleAlert className="h-3.5 w-3.5 text-[hsl(var(--signal-lime-ink))]" />Action required</span><span className="inline-flex items-center gap-2"><Clock3 className="h-3.5 w-3.5 text-[hsl(var(--warning))]" />Due soon</span><span className="inline-flex items-center gap-2"><ArrowUpRight className="h-3.5 w-3.5 text-[hsl(var(--danger))]" />Changed</span><span className="inline-flex items-center gap-2"><Eye className="h-3.5 w-3.5 text-[hsl(var(--foreground-muted))]" />Watching</span><span className="inline-flex items-center gap-2"><CircleCheck className="h-3.5 w-3.5 text-[hsl(var(--success))]" />Resolved</span></div>
+  return <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[hsl(var(--foreground-secondary))]"><span className="inline-flex items-center gap-2"><CircleAlert className="h-3.5 w-3.5 text-[hsl(var(--info))]" />Action required</span><span className="inline-flex items-center gap-2"><Clock3 className="h-3.5 w-3.5 text-[hsl(var(--warning))]" />Due soon</span><span className="inline-flex items-center gap-2"><ArrowUpRight className="h-3.5 w-3.5 text-[hsl(var(--danger))]" />Changed</span><span className="inline-flex items-center gap-2"><Eye className="h-3.5 w-3.5 text-[hsl(var(--foreground-muted))]" />Watching</span><span className="inline-flex items-center gap-2"><CircleCheck className="h-3.5 w-3.5 text-[hsl(var(--success))]" />Resolved</span></div>
 }
 
 export function DifferenceIcon({ entry }: { entry: LedgerEntry }) {

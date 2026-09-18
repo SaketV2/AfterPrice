@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 const designContract = `<!--
   THESIS: AfterPrice makes change after purchase legible through baseline, change, evidence, deadline, action and resolution, refusing a generic finance dashboard.
-  OWN-WORLD: Warm paper, receipt-white surfaces, deep moss actions, saffron change marks, coral pressure states, and ledger rules.
+  OWN-WORLD: Warm paper, receipt-white marketing surfaces, deep moss actions, and a neutral graphite app with cobalt interaction, amber warnings, green success, muted red destructive states, blue information, and ledger rules.
   STORY: A visitor sees what they originally paid, what moved, what evidence exists and the next realistic action.
   FIRST VIEWPORT: Public routes pair a plain post-checkout promise with a tangible price-change record; app routes foreground impact, evidence and deadlines.
   FORM: Paper trail after checkout, assigned direction 4 of the grounded list; direction seed b046054d.

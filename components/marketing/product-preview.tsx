@@ -193,7 +193,7 @@ export function Lifecycle() {
 export function MonitorPreview({ compact = false }: { compact?: boolean }) {
   return (
     <div className={[styles.monitorPreview, compact ? styles.monitorPreviewCompact : ''].join(' ')}>
-      <div className={styles.monitorTopline}><div><span className={styles.monitorMark}>AP</span><span>AfterPrice change ledger</span></div><span className={styles.sampleTag}>Demo data</span></div>
+      <div className={styles.monitorTopline}><div><span className={styles.monitorMark}>AP</span><span>AfterPrice change ledger</span></div><span className={styles.sampleTag}>Illustrative records</span></div>
       <div className={styles.monitorRows}>{changeTypes.map((item, index) => <div key={item.category} className={styles.monitorRow}><div><p>{item.category}</p><strong>{item.title}</strong></div><div><span>{item.baseline}</span><b>→</b><strong>{item.current}</strong></div><span className={index === 0 ? styles.monitorOpportunity : index === 1 ? styles.monitorPressure : styles.monitorWatch}>{item.action} {index === 0 ? <ArrowDownRight size={15} aria-hidden="true" /> : <ArrowUpRight size={15} aria-hidden="true" />}</span></div>)}</div>
       <p className={styles.monitorNote}><ShieldAlert aria-hidden="true" size={15} /> Potential figures stay labelled until an outcome is recorded.</p>
     </div>

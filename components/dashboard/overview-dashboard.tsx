@@ -14,9 +14,9 @@ function SummaryStrip({ entries }: { entries: ReturnType<typeof buildLedgerEntry
   const watchingCount = entries.filter(entry => entry.state === 'watching').length
   const potential = entries.reduce((total, entry) => total + (entry.potentialSavingCents ?? 0), 0)
   const summary = [
-    { label: 'Decisions to review', value: actionCount, helper: 'Stored changes with a next action', icon: CircleAlert, tone: 'text-[hsl(var(--signal-lime-ink))]' },
+    { label: 'Decisions to review', value: actionCount, helper: 'Stored changes with a next action', icon: CircleAlert, tone: 'text-[hsl(var(--info))]' },
     { label: 'Due soon', value: dueCount, helper: 'Renewals and deadlines within 30 days', icon: CalendarClock, tone: 'text-[hsl(var(--warning))]' },
-    { label: 'Potential savings', value: formatMoney(potential), helper: 'Potential only until resolved', icon: PiggyBank, tone: 'text-[hsl(var(--success))]' },
+    { label: 'Potential savings', value: formatMoney(potential), helper: 'Potential only until resolved', icon: PiggyBank, tone: 'text-[hsl(var(--info))]' },
     { label: 'Items watching', value: watchingCount, helper: 'Waiting for compatible evidence', icon: Eye, tone: 'text-[hsl(var(--foreground-muted))]' },
   ] as const
 
@@ -27,10 +27,10 @@ export function OverviewDashboard({ records }: { records: BaselineRecord[] }) {
   const entries = sortLedgerEntries(records.map(record => buildLedgerEntry(record)))
   const actionCount = entries.filter(entry => entry.state === 'action').length
   const dueCount = entries.filter(entry => entry.state === 'due').length
-  const emptyAction = <Link href="/app/add" className="inline-flex min-h-11 items-center gap-2 rounded-input bg-[hsl(var(--surface-dark))] px-4 text-sm font-bold text-[hsl(var(--foreground-on-dark))] transition-colors hover:bg-[hsl(var(--surface-dark-raised))]"><CirclePlus className="h-4 w-4" />Add item</Link>
+  const emptyAction = <Link href="/app/add" className="inline-flex min-h-11 items-center gap-2 rounded-input bg-accent px-4 text-sm font-bold text-[hsl(var(--accent-foreground))] transition-colors hover:bg-[hsl(var(--accent-hover))]"><CirclePlus className="h-4 w-4" />Add item</Link>
 
   return <>
-    <PageIntro title="Today" description="Here are the changes, deadlines and decisions that matter after you buy." action={<Link href="/app/add" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-input bg-[hsl(var(--surface-dark))] px-4 text-sm font-bold text-[hsl(var(--foreground-on-dark))] transition-colors hover:bg-[hsl(var(--surface-dark-raised))]"><CirclePlus className="h-4 w-4" />Add item</Link>} />
+    <PageIntro title="Today" description="Here are the changes, deadlines and decisions that matter after you buy." action={<Link href="/app/add" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-input bg-accent px-4 text-sm font-bold text-[hsl(var(--accent-foreground))] transition-colors hover:bg-[hsl(var(--accent-hover))]"><CirclePlus className="h-4 w-4" />Add item</Link>} />
     <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><p className="font-sans text-lg font-bold">{actionCount ? `${actionCount} ${actionCount === 1 ? 'decision needs' : 'decisions need'} your attention` : 'No decisions need your attention today'}</p><LedgerLegend /></div>
     <SummaryStrip entries={entries} />
     <div className="mt-8"><Ledger entries={entries} emptyTitle="Your ledger is ready for its first baseline" emptyDescription="Add a purchase or subscription. When a compatible observation is stored, AfterPrice will show the difference, evidence and timing here." emptyAction={emptyAction} /></div>

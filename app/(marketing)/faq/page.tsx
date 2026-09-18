@@ -25,9 +25,9 @@ export default function FaqPage() {
             <div className={styles.faqCta}>
               <div>
                 <h3>See one change with its evidence.</h3>
-                <p>The product demo is the fastest way to understand the record.</p>
+                <p>The sample record is the fastest way to understand the workflow.</p>
               </div>
-              <ButtonLink href="/demo">Open the demo <ArrowUpRightIcon /></ButtonLink>
+              <ButtonLink href="/demo">View sample <ArrowUpRightIcon /></ButtonLink>
             </div>
           </div>
         </div>

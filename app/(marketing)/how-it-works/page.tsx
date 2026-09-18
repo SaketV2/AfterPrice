@@ -19,7 +19,7 @@ export default function HowItWorksPage() {
             <p className={styles.sectionMarker}>The record, in order</p>
             <h1>Keep the baseline. Catch the change.</h1>
             <p>AfterPrice turns a purchase, plan or renewal into a seven-stage record: baseline, observe, change, evidence, deadline, action and resolution.</p>
-            <div className={styles.heroActions}><ButtonLink href="/demo">Open the product demo <ArrowUpRightIcon /></ButtonLink><ButtonLink href="/pricing" variant="secondary">See pricing</ButtonLink></div>
+            <div className={styles.heroActions}><ButtonLink href="/demo">View the sample record <ArrowUpRightIcon /></ButtonLink><ButtonLink href="/pricing" variant="secondary">See pricing</ButtonLink></div>
           </div>
           <div className={styles.heroRail}><ChangeRail /></div>
         </div>
@@ -34,7 +34,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
       <section className={styles.finalCtaSection}>
-        <div className={`${styles.pageContainer} ${styles.finalCta}`}><div><h2>Follow one change from baseline to resolution.</h2></div><ButtonLink href="/demo">Open product demo <ArrowUpRightIcon /></ButtonLink></div>
+        <div className={`${styles.pageContainer} ${styles.finalCta}`}><div><h2>Follow one change from baseline to resolution.</h2></div><ButtonLink href="/demo">View sample record <ArrowUpRightIcon /></ButtonLink></div>
       </section>
     </main>
   )

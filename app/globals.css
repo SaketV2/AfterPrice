@@ -95,6 +95,102 @@
   color-scheme: dark;
 }
 
+/* Authenticated app palette. The product surface inherits these tokens so the
+   public marketing world can keep its own paper-and-moss treatment. */
+.product-app {
+  --background: 42 28% 96%;
+  --surface: 40 100% 99%;
+  --surface-subtle: 215 24% 95%;
+  --surface-cool: 213 20% 92%;
+  --surface-dark: 222 20% 13%;
+  --surface-dark-raised: 222 18% 18%;
+  --surface-dark-elevated: 222 16% 23%;
+  --foreground: 222 18% 13%;
+  --foreground-secondary: 216 12% 34%;
+  --foreground-muted: 216 10% 47%;
+  --foreground-on-dark: 42 24% 96%;
+  --border: 214 20% 84%;
+  --border-strong: 214 16% 63%;
+
+  --cobalt: 221 79% 45%;
+  --cobalt-hover: 221 84% 36%;
+  --cobalt-soft: 221 100% 95%;
+  --accent: var(--cobalt);
+  --accent-hover: var(--cobalt-hover);
+  --accent-soft: var(--cobalt-soft);
+  --accent-foreground: 0 0% 100%;
+
+  --signal-lime: var(--cobalt);
+  --signal-lime-ink: var(--accent-foreground);
+  --signal-lime-soft: var(--cobalt-soft);
+  --powder: var(--cobalt-soft);
+  --success: 145 52% 33%;
+  --success-soft: 145 48% 92%;
+  --warning: 38 76% 38%;
+  --warning-soft: 40 92% 91%;
+  --danger: 4 62% 45%;
+  --danger-soft: 5 70% 94%;
+  --potential: var(--warning);
+  --potential-soft: var(--warning-soft);
+  --info: var(--cobalt);
+  --info-soft: var(--cobalt-soft);
+  --neutral: var(--foreground-secondary);
+  --neutral-soft: var(--surface-subtle);
+
+  --radius-major: 20px;
+  --radius-dashboard: 16px;
+  --radius-card: 14px;
+  --radius-input: 10px;
+  --shadow-soft: 0 12px 28px rgba(33, 40, 51, 0.07);
+  --shadow-raised: 0 22px 48px rgba(33, 40, 51, 0.14);
+  --shadow-focus: 0 0 0 4px hsl(var(--cobalt) / 0.22);
+}
+
+[data-theme="dark"] .product-app,
+.dark .product-app {
+  --background: 222 18% 9%;
+  --surface: 222 16% 13%;
+  --surface-subtle: 220 14% 17%;
+  --surface-cool: 220 15% 20%;
+  --surface-dark: 222 20% 7%;
+  --surface-dark-raised: 222 18% 17%;
+  --surface-dark-elevated: 222 16% 22%;
+  --foreground: 42 20% 94%;
+  --foreground-secondary: 216 10% 76%;
+  --foreground-muted: 215 10% 58%;
+  --foreground-on-dark: 42 20% 94%;
+  --border: 215 15% 27%;
+  --border-strong: 215 14% 42%;
+
+  --cobalt: 221 83% 63%;
+  --cobalt-hover: 221 86% 71%;
+  --cobalt-soft: 221 33% 21%;
+  --accent: var(--cobalt);
+  --accent-hover: var(--cobalt-hover);
+  --accent-soft: var(--cobalt-soft);
+  --accent-foreground: 222 25% 10%;
+  --signal-lime: var(--cobalt);
+  --signal-lime-ink: var(--accent-foreground);
+  --signal-lime-soft: var(--cobalt-soft);
+  --powder: var(--cobalt-soft);
+  --success: 145 55% 55%;
+  --success-soft: 145 25% 18%;
+  --warning: 38 90% 65%;
+  --warning-soft: 38 35% 20%;
+  --danger: 4 70% 65%;
+  --danger-soft: 4 35% 20%;
+  --potential: var(--warning);
+  --potential-soft: var(--warning-soft);
+  --info: var(--cobalt);
+  --info-soft: var(--cobalt-soft);
+  --neutral: var(--foreground-secondary);
+  --neutral-soft: var(--surface-subtle);
+
+  --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.24);
+  --shadow-raised: 0 24px 60px rgba(0, 0, 0, 0.36);
+  --shadow-focus: 0 0 0 4px hsl(var(--cobalt) / 0.28);
+}
+
 * {
   border-color: hsl(var(--semantic-border, var(--border)));
 }
@@ -116,6 +212,11 @@ body {
   font-variant-numeric: tabular-nums;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+.product-app {
+  min-width: 0;
+  overflow-x: clip;
 }
 
 h1,
@@ -259,6 +360,6 @@ section[id] {
 
 @media (max-width: 640px) {
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }

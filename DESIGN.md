@@ -6,7 +6,7 @@ Ground truth for the shipped AfterPrice marketing website and authenticated Supa
 
 AfterPrice is a post-purchase record, not a budgeting dashboard or a fully automated claims service. Its organising sequence is **baseline → change → evidence → deadline → action → resolution**. Every record should make the original state, what moved, where the signal came from, how long it matters and what to review next legible together.
 
-Public routes use a warm paper trail with quiet white receipt surfaces. The authenticated app uses the same light ledger language, with a graphite compatibility theme available through the existing theme provider. Product previews may use deep moss as a focused evidence surface; there is no large blue-black marketing canvas.
+Public routes use a warm paper trail with quiet white receipt surfaces. The authenticated app is a separate neutral graphite workspace: graphite canvas and panels, cobalt interaction, amber warning, green success, muted red destructive states and blue informational states. Product previews may use deep moss as a focused evidence surface; there is no large blue-black marketing canvas.
 
 ## Brand mark and typography
 
@@ -24,7 +24,7 @@ Use the system sans stack for headings, body copy, navigation, controls and dens
 
 | Role | Token | Use |
 | --- | --- | --- |
-| Paper | `#F4F0E7` | Main marketing and app canvas |
+| Paper | `#F4F0E7` | Main marketing canvas |
 | Paper raised | `#FFFDF8` | Receipt surfaces, cards and readable bands |
 | Ink | `#181A16` | Primary text and high-contrast content |
 | Muted ink | `#66685F` | Supporting copy and metadata |
@@ -36,6 +36,21 @@ Use the system sans stack for headings, body copy, navigation, controls and dens
 
 These roles are defined in the marketing module and mapped into the global semantic HSL aliases for the authenticated app. Use contrast and text labels in addition to colour; potential money is never presented as confirmed recovery.
 
+The authenticated dark app uses neutral HSL roles rather than green surfaces:
+
+| Role | Token | Use |
+| --- | --- | --- |
+| Graphite canvas | `hsl(222 18% 9%)` | App background |
+| Graphite panel | `hsl(222 16% 13%)` | Cards, sidebar and controls |
+| Graphite raised | `hsl(220 14% 17%)` | Hover and nested surfaces |
+| Cobalt | `hsl(221 83% 63%)` | Primary interaction, focus and active navigation |
+| Amber | `hsl(38 90% 65%)` | Warnings and potential differences |
+| Green | `hsl(145 55% 55%)` | Confirmed success only |
+| Muted red | `hsl(4 70% 65%)` | Destructive actions and errors |
+| Blue information | `var(--cobalt)` | Informational state |
+
+Shape and spacing use a restrained radius scale: 8–10px controls, 14px cards, 16px dashboard panels, 20px major surfaces and full pills only for compact status tags. Shadows are soft in light mode and deeper in graphite mode. Public and app surfaces use a capped reading width with generous section padding; dense app layouts remain grid-aligned.
+
 ## Layout and component grammar
 
 Marketing pages use a shared wordmark header, short monospace section marker, concrete copy, an illustrative record and one clear next action. Content is capped at about 1280px. The homepage demonstrates one Sony WH-1000XM6 example early: `$349` paid, `$299` observed, `$50` potential difference, Sony Store source and four days to review the retailer policy. It is explicitly sample data.
@@ -44,7 +59,7 @@ The public site uses authored geometry instead of unrelated stock or competitor 
 
 Flat records prefer rules and aligned values over repeated floating cards. A change row keeps its type, provider, identity, before/after value, evidence state and next action together. Buttons are compact, semibold and at least 40–48px high. Primary actions use moss; secondary actions use raised paper and a line. Status pills are reserved for filters and meaningful states, and icons are decorative unless they have an accessible label.
 
-The authenticated product remains data-first. Its dashboard sorts actionable changes ahead of watching records, shows baseline beside current values, distinguishes evidence availability, and gives one useful next action. Supabase auth, schemas, RLS, routes and data behaviour are preserved. Empty states explain the record lifecycle without inserting sample records into a user account.
+The authenticated product remains data-first. Its dashboard sorts actionable changes ahead of watching records, shows baseline beside current values, distinguishes evidence availability, and gives one useful next action. Supabase auth, schemas, RLS, routes and data behaviour are preserved. Empty states explain the record lifecycle without inserting sample records into a user account. Billing uses Stripe-hosted Checkout and Customer Portal; server-owned Price ID allowlists, signed webhooks and server-side entitlements are the source of truth.
 
 ## Interaction and accessibility
 
@@ -57,11 +72,11 @@ The authenticated product remains data-first. Its dashboard sorts actionable cha
 
 ## Responsive contract
 
-The marketing header collapses below `lg`. Hero, record, coverage, FAQ and CTA layouts collapse to one column on narrow screens. The final CTA places its action to the right and vertically centres it on desktop, then stacks it full-width on mobile. Dashboard navigation and comparison panels similarly collapse below `lg`, with evidence and baseline/current values remaining readable without horizontal page overflow.
+The marketing header collapses below `lg`. Hero, record, coverage, FAQ, pricing and CTA layouts collapse to one column on narrow screens. The final CTA places its action to the right and vertically centres it on desktop, then stacks it full-width on mobile. Dashboard navigation and comparison panels similarly collapse below `lg`, with evidence and baseline/current values remaining readable without horizontal page overflow.
 
 ## Content truth
 
-Use concrete Australian English and `en-AU` date conventions. Say when a record or source is illustrative, manual or unavailable. AfterPrice does not connect to a bank, submit claims, guarantee refunds, cancel subscriptions or process payments in V1. A lower price is a prompt to review terms, not proof of a refund. Keep potential amounts labelled until the user records an outcome.
+Use concrete Australian English and `en-AU` date conventions. Say when a record or source is illustrative, manual or unavailable. AfterPrice does not connect to a bank, submit claims, guarantee refunds or cancel subscriptions. Stripe handles Pro payment details in hosted Checkout; a paid entitlement is granted only from verified webhook state and an authenticated account. A lower price is a prompt to review terms, not proof of a refund. Keep potential amounts labelled until the user records an outcome.
 
 ## Source files
 
