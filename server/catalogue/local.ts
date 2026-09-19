@@ -3,7 +3,7 @@ import 'server-only'
 import type { Database } from '@/lib/supabase/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { deduplicateProducts, normalizeIdentifier, normalizeSearchTerm, productFromCatalogProduct, rankCatalogueProduct } from './normalization'
-import type { CatalogueEntityProduct, NormalizedCatalogueProduct } from './types'
+import type { CatalogueEntityProduct, CatalogueIdentifierType, NormalizedCatalogueProduct } from './types'
 
 type SupabaseServerClient = SupabaseClient<Database>
 type CatalogRow = Database['public']['Tables']['catalog_products']['Row']
@@ -14,10 +14,15 @@ function escapeIlike(value: string): string {
   return value.replace(/[\\%_]/g, character => `\\${character}`)
 }
 
+function isCatalogueIdentifierType(value: string): value is CatalogueIdentifierType {
+  return ['gtin', 'ean', 'upc', 'mpn', 'epid', 'sku'].includes(value)
+}
+
 function toProduct(row: CatalogRow, aliases: string[] = [], identifiers: IdentifierRow[] = []): NormalizedCatalogueProduct {
   const grouped: Partial<Record<'gtin' | 'ean' | 'upc' | 'mpn' | 'epid' | 'sku', string[]>> = {}
   for (const identifier of identifiers) {
     const type = identifier.identifier_type === 'ebay_epid' ? 'epid' : identifier.identifier_type === 'retailer_sku' ? 'sku' : identifier.identifier_type
+    if (!isCatalogueIdentifierType(type)) continue
     const values = grouped[type] ?? []
     values.push(identifier.identifier_value)
     grouped[type] = values

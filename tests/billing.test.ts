@@ -2,6 +2,9 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { createPendingCheckoutClaim, hashClaimToken, normalizeBillingEmail } from '../lib/billing/claims'
 import { CHECKOUT_SESSION_ID_PATTERN } from '../lib/billing/validation'
 import { getBillingPlan, getPlanKeyForPriceId } from '../lib/billing/plan-config'
+import { isEntitledBillingSubscription } from '../lib/billing/entitlement'
+import { checkoutIdempotencyKey } from '../lib/billing/checkout-key'
+import { hashRateLimitKey } from '../lib/billing/rate-limit'
 
 const originalEnvironment = {
   monthly: process.env.STRIPE_PRICE_MONTHLY,
@@ -41,5 +44,29 @@ describe('billing security boundaries', () => {
     expect(getBillingPlan('monthly')).toEqual({ key: 'monthly', priceId: 'price_monthly' })
     expect(getPlanKeyForPriceId('price_monthly')).toBe('monthly')
     expect(getPlanKeyForPriceId('price_attacker_supplied')).toBe('unknown')
+  })
+
+  it.each([
+    ['no subscription', { status: 'canceled', payment_state: 'paid', plan_key: 'monthly', current_period_end: null }, false],
+    ['active and paid', { status: 'active', payment_state: 'paid', plan_key: 'monthly', current_period_end: '2026-10-01T00:00:00Z' }, true],
+    ['trialing and no payment required', { status: 'trialing', payment_state: 'no_payment_required', plan_key: 'yearly', current_period_end: '2026-10-01T00:00:00Z' }, true],
+    ['past due', { status: 'past_due', payment_state: 'paid', plan_key: 'monthly', current_period_end: '2026-10-01T00:00:00Z' }, false],
+    ['unpaid', { status: 'active', payment_state: 'unpaid', plan_key: 'monthly', current_period_end: '2026-10-01T00:00:00Z' }, false],
+    ['cancelled', { status: 'canceled', payment_state: 'paid', plan_key: 'monthly', current_period_end: '2026-10-01T00:00:00Z' }, false],
+    ['expired period', { status: 'active', payment_state: 'paid', plan_key: 'monthly', current_period_end: '2026-09-01T00:00:00Z' }, false],
+  ])('applies the Pro entitlement matrix: %s', (_label, row, expected) => {
+    expect(isEntitledBillingSubscription(row, new Date('2026-09-19T00:00:00Z'))).toBe(expected)
+  })
+
+  it('hashes rate-limit identifiers without persisting raw PII', () => {
+    const email = 'person@example.com'
+    const hash = hashRateLimitKey(`checkout:guest-email:${email}`)
+    expect(hash).toMatch(/^[0-9a-f]{64}$/)
+    expect(hash).not.toContain(email)
+  })
+
+  it('uses a per-attempt, non-PII Stripe Checkout idempotency key', () => {
+    expect(checkoutIdempotencyKey('attempt_123')).toBe('afterprice_checkout_attempt_123')
+    expect(checkoutIdempotencyKey('attempt_123')).not.toContain('person@example.com')
   })
 })

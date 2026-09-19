@@ -4,6 +4,10 @@ import * as React from "react";
 
 export type Theme = "light" | "dark" | "system";
 
+export function isTheme(value: unknown): value is Theme {
+  return value === "light" || value === "dark" || value === "system";
+}
+
 type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
@@ -36,7 +40,7 @@ export function ThemeProvider({
     queueMicrotask(() => {
       if (!active) return;
       const stored = window.localStorage.getItem(storageKey) as Theme | null;
-      if (stored === "light" || stored === "dark" || stored === "system") {
+      if (isTheme(stored)) {
         setThemeState(stored);
       }
       setSystemTheme(getSystemTheme());

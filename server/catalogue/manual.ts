@@ -30,9 +30,3 @@ export function normalizeManualProduct(input: ManualProductInput): NormalizedCat
   if (!product) throw new Error('A product name is required.')
   return product
 }
-
-export async function persistManualProduct(_supabase: unknown, _userId: string, product: NormalizedCatalogueProduct) {
-  // Manual products are intentionally stored on the user's purchase row rather
-  // than inserted into the shared catalogue by an ordinary authenticated user.
-  return product
-}

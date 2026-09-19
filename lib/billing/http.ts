@@ -8,7 +8,14 @@ export function sameBillingOrigin(request: Request, siteUrl = getBillingSiteUrl(
 }
 
 export function billingErrorResponse(error: unknown): NextResponse {
-  if (error instanceof BillingConfigurationError) return NextResponse.json({ error: error.message }, { status: 503 })
-  if (error instanceof BillingPersistenceError) return NextResponse.json({ error: 'Billing could not be completed. Try again.' }, { status: 502 })
+  if (error instanceof BillingConfigurationError) {
+    console.error('Billing configuration error', { code: error.code, message: error.message })
+    return NextResponse.json({ error: 'Billing is temporarily unavailable.', code: 'BILLING_UNAVAILABLE' }, { status: 503 })
+  }
+  if (error instanceof BillingPersistenceError) {
+    console.error('Billing persistence error', { code: error.code, message: error.message })
+    return NextResponse.json({ error: 'Billing could not be completed. Try again.', code: 'BILLING_UNAVAILABLE' }, { status: 502 })
+  }
+  console.error('Unexpected billing error', error)
   return NextResponse.json({ error: 'Billing could not be completed. Try again.' }, { status: 502 })
 }

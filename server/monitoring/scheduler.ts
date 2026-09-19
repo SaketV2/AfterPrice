@@ -1,6 +1,6 @@
 import type { NormalizedCatalogueProduct } from '@/server/catalogue/types'
 import type { MonitoringCheckResult, PriceObservation, ProductPriceSource } from './types'
-import { normalizePriceObservation } from './observation'
+import { normalizePriceObservation } from './normalization'
 
 export const MONITORING_POLICY = {
   activeReturnWindowHours: 12,
@@ -19,6 +19,38 @@ export function cadenceForReturnWindow(returnDeadline: string | null | undefined
   if (Number.isNaN(deadline.getTime()) || deadline.getTime() <= now.getTime()) return 'paused'
   const hoursRemaining = (deadline.getTime() - now.getTime()) / 3_600_000
   return hoursRemaining <= MONITORING_POLICY.activeReturnWindowHours ? 'frequent' : 'standard'
+}
+
+export function monitoringIntervalMinutes(cadence: MonitoringCadence): number {
+  if (cadence === 'frequent') return MONITORING_POLICY.activeReturnWindowIntervalMinutes
+  if (cadence === 'standard') return MONITORING_POLICY.standardProductIntervalMinutes
+  return Number.POSITIVE_INFINITY
+}
+
+export type MonitoringSweepOptions = {
+  persist?: (observation: PriceObservation) => Promise<{ stored: boolean; reason?: string }>
+  now?: Date
+  concurrency?: number
+  /** The nearest active return deadline for each catalogue product. */
+  returnDeadlineByProduct?: ReadonlyMap<string, string | null | undefined>
+  /** The last successful persisted source check for each catalogue product. */
+  lastSuccessfulCheckByProduct?: ReadonlyMap<string, string | null | undefined>
+}
+
+export function isProductDue(
+  product: NormalizedCatalogueProduct,
+  options: Pick<MonitoringSweepOptions, 'now' | 'returnDeadlineByProduct' | 'lastSuccessfulCheckByProduct'> = {},
+): boolean {
+  const now = options.now ?? new Date()
+  const productId = product.catalogProductId
+  const deadline = productId ? options.returnDeadlineByProduct?.get(productId) : undefined
+  const cadence = cadenceForReturnWindow(deadline, now)
+  if (cadence === 'paused') return false
+  const lastCheck = productId ? options.lastSuccessfulCheckByProduct?.get(productId) : undefined
+  if (!lastCheck) return true
+  const lastCheckAt = Date.parse(lastCheck)
+  if (Number.isNaN(lastCheckAt)) return true
+  return now.getTime() - lastCheckAt >= monitoringIntervalMinutes(cadence) * 60_000
 }
 
 export async function checkProductNow(
@@ -66,10 +98,27 @@ export async function checkProductNow(
 export async function runMonitoringSweep(
   products: NormalizedCatalogueProduct[],
   sources: ProductPriceSource[],
-  options: { persist?: (observation: PriceObservation) => Promise<{ stored: boolean; reason?: string }>; now?: Date } = {},
+  options: MonitoringSweepOptions = {},
 ): Promise<MonitoringCheckResult[]> {
-  const selected = products.slice(0, MONITORING_POLICY.maxProductsPerRun)
-  const results: MonitoringCheckResult[] = []
-  for (const product of selected) results.push(await checkProductNow(product, sources, options.persist, options.now))
+  const now = options.now ?? new Date()
+  const selected = products
+    .filter(product => isProductDue(product, { ...options, now }))
+    .slice(0, MONITORING_POLICY.maxProductsPerRun)
+  if (!selected.length) return []
+
+  // A small native worker pool keeps provider calls bounded without adding a
+  // dependency or creating one promise per product at once.
+  const concurrency = Math.max(1, Math.min(options.concurrency ?? 4, selected.length))
+  const results = new Array<MonitoringCheckResult>(selected.length)
+  let nextIndex = 0
+  async function worker() {
+    while (true) {
+      const index = nextIndex
+      nextIndex += 1
+      if (index >= selected.length) return
+      results[index] = await checkProductNow(selected[index], sources, options.persist, now)
+    }
+  }
+  await Promise.all(Array.from({ length: concurrency }, () => worker()))
   return results
 }

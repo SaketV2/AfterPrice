@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { calculateProductOpportunity } from './opportunity'
 import { validateSupportedUrl } from './url-safety'
 import type { PriceObservation } from './types'
+import { isProductDue, runMonitoringSweep } from './scheduler'
+import { isSubscriptionObservationDue } from './subscription-cadence'
+import { classifySubscriptionObservationTransition } from './subscription-logic'
+import type { NormalizedCatalogueProduct } from '@/server/catalogue/types'
 
 const observation = (overrides: Partial<PriceObservation> = {}): PriceObservation => ({
   canonicalKey: 'sony-wh1000xm6',
@@ -49,5 +53,88 @@ describe('supported URL safety', () => {
     expect(validateSupportedUrl('https://localhost/secret').ok).toBe(false)
     expect(validateSupportedUrl('https://169.254.169.254/latest/meta-data').ok).toBe(false)
     expect(validateSupportedUrl('https://attacker.example/redirect').ok).toBe(false)
+  })
+})
+
+describe('monitoring cadence and bounded workers', () => {
+  const product = (id: string): NormalizedCatalogueProduct => ({
+    catalogProductId: id,
+    canonicalKey: id,
+    provider: 'test',
+    displayName: `Test ${id}`,
+    aliases: [],
+    identifiers: {},
+    metadata: {},
+  })
+
+  it('does not recheck a standard product before its interval', () => {
+    const now = new Date('2026-09-19T12:00:00Z')
+    expect(isProductDue(product('00000000-0000-4000-8000-000000000001'), {
+      now,
+      lastSuccessfulCheckByProduct: new Map([['00000000-0000-4000-8000-000000000001', '2026-09-19T00:00:00Z']]),
+    })).toBe(false)
+    expect(isProductDue(product('00000000-0000-4000-8000-000000000001'), {
+      now,
+      lastSuccessfulCheckByProduct: new Map([['00000000-0000-4000-8000-000000000001', '2026-09-18T00:00:00Z']]),
+    })).toBe(true)
+  })
+
+  it('respects paused return windows', () => {
+    expect(isProductDue(product('00000000-0000-4000-8000-000000000002'), {
+      now: new Date('2026-09-19T12:00:00Z'),
+      returnDeadlineByProduct: new Map([['00000000-0000-4000-8000-000000000002', '2026-09-19T11:00:00Z']]),
+    })).toBe(false)
+  })
+
+  it('does not exceed the configured worker concurrency', async () => {
+    let active = 0
+    let maximum = 0
+    const source = {
+      id: 'test-source',
+      status: () => ({ id: 'test-source', available: true }),
+      supports: () => true,
+      observe: async (item: NormalizedCatalogueProduct) => {
+        active += 1
+        maximum = Math.max(maximum, active)
+        await new Promise(resolve => setTimeout(resolve, 5))
+        active -= 1
+        return observation({ canonicalKey: item.canonicalKey, sourceListingId: item.catalogProductId })
+      },
+    }
+    const results = await runMonitoringSweep(Array.from({ length: 6 }, (_, index) => product(`00000000-0000-4000-8000-${String(index + 10).padStart(12, '0')}`)), [source], { concurrency: 2 })
+    expect(results).toHaveLength(6)
+    expect(maximum).toBeLessThanOrEqual(2)
+  })
+})
+
+describe('subscription cadence', () => {
+  it('allows a first snapshot and waits for the configured interval', () => {
+    const now = new Date('2026-09-19T12:00:00Z')
+    expect(isSubscriptionObservationDue(undefined, now)).toBe(true)
+    expect(isSubscriptionObservationDue('2026-09-19T00:00:00Z', now)).toBe(false)
+    expect(isSubscriptionObservationDue('2026-09-18T00:00:00Z', now)).toBe(true)
+  })
+
+  const plan = (overrides: Partial<Parameters<typeof classifySubscriptionObservationTransition>[0]> = {}) => ({
+    id: '00000000-0000-4000-8000-000000000010',
+    catalog_service_id: '00000000-0000-4000-8000-000000000011',
+    catalog_plan_id: '00000000-0000-4000-8000-000000000012',
+    price_cents: 1200,
+    currency: 'AUD',
+    cadence: 'monthly' as const,
+    feature_data: {},
+    source: 'catalogue',
+    source_url: 'https://example.com/plan',
+    observed_at: '2026-09-19T00:00:00Z',
+    created_at: '2026-09-19T00:00:00Z',
+    ...overrides,
+  })
+
+  it('classifies trusted plan transitions without alerting on unchanged snapshots', () => {
+    const baseline = { amountCents: 1500, currency: 'AUD' }
+    expect(classifySubscriptionObservationTransition(plan(), plan(), baseline)).toEqual({ materialChange: false, priceTransition: false, cheaperThanBaseline: false })
+    expect(classifySubscriptionObservationTransition(plan(), plan({ price_cents: 1000 }), baseline).cheaperThanBaseline).toBe(true)
+    expect(classifySubscriptionObservationTransition(plan(), plan({ price_cents: 1800 }), baseline).materialChange).toBe(true)
+    expect(classifySubscriptionObservationTransition(plan(), plan({ cadence: 'annual' }), baseline).materialChange).toBe(true)
   })
 })

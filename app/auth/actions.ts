@@ -4,7 +4,9 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { safeAppPath } from '@/lib/auth/redirects'
+import { publicSignupError } from '@/lib/auth/messages'
 import { CHECKOUT_SESSION_ID_PATTERN, CLAIM_TOKEN_PATTERN } from '@/lib/billing/validation'
+import { getPublicSiteOrigin } from '@/lib/http/site-origin'
 import { createClient } from '@/lib/supabase/server'
 
 export type AuthState = { error?: string; message?: string }
@@ -36,9 +38,12 @@ export async function signup(_: AuthState, formData: FormData): Promise<AuthStat
   const next = safeAppPath(formData.get('next'))
   const claim = getCheckoutClaim(formData)
   const signupNext = claim ? `/app?checkout=claim&session_id=${encodeURIComponent(claim.sessionId)}&claim_token=${encodeURIComponent(claim.claimToken)}` : next
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const origin = getPublicSiteOrigin()
   const { data, error } = await supabase.auth.signUp({ email: parsed.data.email, password: parsed.data.password, options: { data: { display_name: parsed.data.name }, emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(signupNext)}` } })
-  if (error) return { error: error.message }
+  if (error) {
+    console.error('[auth.signup] Supabase signup failed.', error)
+    return { error: publicSignupError(error) }
+  }
   if (!data.session) return { message: claim ? 'Payment is recorded. Check your email to confirm your account, then return here to finish setup.' : 'Check your email to confirm your account, then log in.' }
   revalidatePath('/', 'layout')
   redirect(signupNext)
@@ -54,7 +59,7 @@ export async function logout() {
 export async function requestPasswordReset(_: AuthState, formData: FormData): Promise<AuthState> {
   const email = z.string().email().safeParse(formData.get('email'))
   if (!email.success) return { error: 'Enter the email address for your account.' }
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const origin = getPublicSiteOrigin()
   const supabase = await createClient()
   const { error } = await supabase.auth.resetPasswordForEmail(email.data, { redirectTo: `${origin}/auth/callback?next=/reset-password` })
   return error ? { error: 'The reset email could not be sent. Try again.' } : { message: 'If that account exists, a password reset link is on its way.' }

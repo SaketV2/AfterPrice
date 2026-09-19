@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { normalizeManualProduct, persistManualProduct } from '@/server/catalogue/manual'
+import { normalizeManualProduct } from '@/server/catalogue/manual'
+import { previewManualProduct } from '@/server/catalogue/manual-preview'
+import { serverErrorResponse } from '@/lib/http/server-error'
 import { validateSupportedUrl } from '@/server/monitoring/url-safety'
 
 export const dynamic = 'force-dynamic'
@@ -35,9 +37,12 @@ export async function POST(request: Request) {
   }
   try {
     const product = normalizeManualProduct(parsed)
-    const entity = await persistManualProduct(supabase, claims.sub, product)
-    return NextResponse.json({ product, entity }, { status: 201 })
+    return NextResponse.json(previewManualProduct(product), { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Manual product could not be saved.' }, { status: 502 })
+    return serverErrorResponse('catalogue.manual', error, {
+      code: 'CATALOGUE_UNAVAILABLE',
+      message: 'Manual product validation is temporarily unavailable.',
+      status: 502,
+    })
   }
 }

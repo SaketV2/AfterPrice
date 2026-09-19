@@ -1,12 +1,15 @@
 import type Stripe from 'stripe'
+import { randomUUID } from 'node:crypto'
 import { createPendingCheckoutClaim, PENDING_CHECKOUT_TTL_MS, normalizeBillingEmail, randomIntegrationSuffix } from '@/lib/billing/claims'
 import { getBillingPlan, getBillingSiteUrl, type BillingPlanKey } from '@/lib/billing/env'
 import { BillingPersistenceError } from '@/lib/billing/errors'
 import { getStripeClient } from '@/lib/billing/stripe'
 import { getBillingAdminClient } from '@/lib/billing/supabase'
+import { checkoutIdempotencyKey } from '@/lib/billing/checkout-key'
 import {
   attachCheckoutSession,
   createPendingCheckout,
+  expireStalePendingCheckouts,
   findBillingCustomer,
   markPendingCheckoutExpired,
   saveBillingCustomer,
@@ -17,6 +20,7 @@ export type CreateCheckoutInput = {
   userId?: string
   userEmail?: string | null
   guestEmail?: string
+  checkoutAttemptId?: string
 }
 
 export type CheckoutCreationResult = {
@@ -49,6 +53,9 @@ export async function createCheckoutSession(input: CreateCheckoutInput): Promise
   const isAuthenticated = Boolean(input.userId)
   const email = isAuthenticated ? normalizeBillingEmail(input.userEmail ?? '') : normalizeBillingEmail(input.guestEmail ?? '')
   if (!email) throw new BillingPersistenceError('A checkout email address is required.')
+  const checkoutAttemptId = input.checkoutAttemptId ?? randomUUID()
+
+  await expireStalePendingCheckouts(db)
 
   const claim = isAuthenticated ? null : createPendingCheckoutClaim()
   if (claim) {
@@ -87,7 +94,9 @@ export async function createCheckoutSession(input: CreateCheckoutInput): Promise
 
   let session: Stripe.Checkout.Session
   try {
-    session = await stripe.checkout.sessions.create(params)
+    session = await stripe.checkout.sessions.create(params, {
+      idempotencyKey: checkoutIdempotencyKey(checkoutAttemptId),
+    })
   } catch (error) {
     if (claim) {
       try {

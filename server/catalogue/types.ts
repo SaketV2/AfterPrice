@@ -35,6 +35,7 @@ export type CatalogueSearchOptions = {
   limit?: number
   minimumLocalResults?: number
   allowExternal?: boolean
+  requestId?: string
 }
 
 export type CatalogueSearchResult = {

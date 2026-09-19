@@ -91,6 +91,58 @@ function observationForPlan(plan: SubscriptionPlanObservation, fallbackPlanName:
   }
 }
 
+type PriceRow = PriceObservation & { product_sources?: { provider: string; source_url: string | null; listing_identifier: string } | null }
+
+function mapPurchaseBaseline(purchase: PurchaseWithProduct, userId: string, prices: PriceRow[]): BaselineRecord {
+  const product = purchase.catalog_products
+  const displayName = product ? [product.brand, product.name].filter(Boolean).join(' ') : purchase.custom_product_name ?? 'Custom product'
+  const entity = entityForProduct(purchase, displayName)
+  return {
+    id: purchase.id,
+    user_id: userId,
+    entity_id: entity.id,
+    baseline_type: 'purchase' as const,
+    display_name: displayName,
+    original_amount_cents: purchase.paid_amount_cents,
+    currency: purchase.currency,
+    plan_name: null,
+    billing_interval: null,
+    renewal_at: null,
+    captured_at: purchase.purchase_date,
+    source_url: purchase.purchase_url,
+    created_at: purchase.created_at,
+    updated_at: purchase.updated_at,
+    entities: { ...entity, observations: prices.map(price => observationForPrice(price)) },
+  } as BaselineRecord
+}
+
+function mapSubscriptionBaseline(subscription: SubscriptionWithCatalogue, userId: string, plans: SubscriptionPlanObservation[]): BaselineRecord {
+  const service = subscription.catalog_services
+  const plan = subscription.catalog_subscription_plans
+  const displayName = service?.name ?? subscription.custom_service_name ?? 'Custom subscription'
+  const entity = entityForSubscription(subscription, displayName)
+  const observations = plans
+    .filter(observation => !subscription.catalog_plan_id || observation.catalog_plan_id === subscription.catalog_plan_id || observation.catalog_plan_id === null)
+    .map(observation => observationForPlan(observation, plan?.name ?? null))
+  return {
+    id: subscription.id,
+    user_id: userId,
+    entity_id: entity.id,
+    baseline_type: 'subscription' as const,
+    display_name: displayName,
+    original_amount_cents: subscription.amount_cents,
+    currency: subscription.currency,
+    plan_name: plan?.name ?? null,
+    billing_interval: subscription.billing_cadence,
+    renewal_at: subscription.renewal_date,
+    captured_at: subscription.start_date,
+    source_url: subscription.manage_url,
+    created_at: subscription.created_at,
+    updated_at: subscription.updated_at,
+    entities: { ...entity, observations },
+  } as BaselineRecord
+}
+
 export const getBaselines = cache(async () => {
   const { supabase, userId } = await requireAuthenticatedContext()
   const [purchasesResult, subscriptionsResult] = await Promise.all([
@@ -115,67 +167,39 @@ export const getBaselines = cache(async () => {
   if (priceResult.error) throw new Error(`Could not load price observations: ${priceResult.error.message}`)
   if (planResult.error) throw new Error(`Could not load subscription observations: ${planResult.error.message}`)
 
-  type PriceRow = PriceObservation & { product_sources?: { provider: string; source_url: string | null; listing_identifier: string } | null }
   const priceRows = (priceResult.data ?? []) as unknown as PriceRow[]
   const planRows = (planResult.data ?? []) as unknown as SubscriptionPlanObservation[]
   const pricesByProduct = groupBy(priceRows, item => item.catalog_product_id)
   const plansByService = groupBy(planRows, item => item.catalog_service_id)
 
-  const purchaseRecords = purchases.map(purchase => {
-    const product = purchase.catalog_products
-    const displayName = product ? [product.brand, product.name].filter(Boolean).join(' ') : purchase.custom_product_name ?? 'Custom product'
-    const entity = entityForProduct(purchase, displayName)
-    return {
-      id: purchase.id,
-      user_id: userId,
-      entity_id: entity.id,
-      baseline_type: 'purchase' as const,
-      display_name: displayName,
-      original_amount_cents: purchase.paid_amount_cents,
-      currency: purchase.currency,
-      plan_name: null,
-      billing_interval: null,
-      renewal_at: null,
-      captured_at: purchase.purchase_date,
-      source_url: purchase.purchase_url,
-      created_at: purchase.created_at,
-      updated_at: purchase.updated_at,
-      entities: { ...entity, observations: (pricesByProduct.get(purchase.catalog_product_id ?? '') ?? []).map(price => observationForPrice(price)) },
-    }
-  })
-
-  const subscriptionRecords = subscriptions.map(subscription => {
-    const service = subscription.catalog_services
-    const plan = subscription.catalog_subscription_plans
-    const displayName = service?.name ?? subscription.custom_service_name ?? 'Custom subscription'
-    const entity = entityForSubscription(subscription, displayName)
-    const observations = (plansByService.get(subscription.catalog_service_id ?? '') ?? [])
-      .filter(observation => !subscription.catalog_plan_id || observation.catalog_plan_id === subscription.catalog_plan_id || observation.catalog_plan_id === null)
-      .map(observation => observationForPlan(observation, plan?.name ?? null))
-    return {
-      id: subscription.id,
-      user_id: userId,
-      entity_id: entity.id,
-      baseline_type: 'subscription' as const,
-      display_name: displayName,
-      original_amount_cents: subscription.amount_cents,
-      currency: subscription.currency,
-      plan_name: plan?.name ?? null,
-      billing_interval: subscription.billing_cadence,
-      renewal_at: subscription.renewal_date,
-      captured_at: subscription.start_date,
-      source_url: subscription.manage_url,
-      created_at: subscription.created_at,
-      updated_at: subscription.updated_at,
-      entities: { ...entity, observations },
-    }
-  })
+  const purchaseRecords = purchases.map(purchase => mapPurchaseBaseline(purchase, userId, pricesByProduct.get(purchase.catalog_product_id ?? '') ?? []))
+  const subscriptionRecords = subscriptions.map(subscription => mapSubscriptionBaseline(subscription, userId, plansByService.get(subscription.catalog_service_id ?? '') ?? []))
 
   return [...purchaseRecords, ...subscriptionRecords].sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at)) as BaselineRecord[]
 })
 
 export const getBaseline = cache(async (id: string) => {
-  return (await getBaselines()).find(record => record.id === id) ?? null
+  const { supabase, userId } = await requireAuthenticatedContext()
+  const purchaseResult = await supabase.from('purchases').select('*, catalog_products(*)').eq('id', id).eq('user_id', userId).maybeSingle()
+  if (purchaseResult.error) throw new Error(`Could not load purchase baseline: ${purchaseResult.error.message}`)
+  if (purchaseResult.data) {
+    const purchase = purchaseResult.data as unknown as PurchaseWithProduct
+    const priceResult = purchase.catalog_product_id
+      ? await supabase.from('price_observations').select('*, product_sources(provider, source_url, listing_identifier)').eq('catalog_product_id', purchase.catalog_product_id).order('observed_at', { ascending: false }).limit(100)
+      : { data: [], error: null }
+    if (priceResult.error) throw new Error(`Could not load price observations: ${priceResult.error.message}`)
+    return mapPurchaseBaseline(purchase, userId, (priceResult.data ?? []) as unknown as PriceRow[])
+  }
+
+  const subscriptionResult = await supabase.from('subscriptions').select('*, catalog_services(*), catalog_subscription_plans(*)').eq('id', id).eq('user_id', userId).maybeSingle()
+  if (subscriptionResult.error) throw new Error(`Could not load subscription baseline: ${subscriptionResult.error.message}`)
+  if (!subscriptionResult.data) return null
+  const subscription = subscriptionResult.data as unknown as SubscriptionWithCatalogue
+  const planResult = subscription.catalog_service_id
+    ? await supabase.from('subscription_plan_observations').select('*').eq('catalog_service_id', subscription.catalog_service_id).order('observed_at', { ascending: false }).limit(100)
+    : { data: [], error: null }
+  if (planResult.error) throw new Error(`Could not load subscription observations: ${planResult.error.message}`)
+  return mapSubscriptionBaseline(subscription, userId, (planResult.data ?? []) as unknown as SubscriptionPlanObservation[])
 })
 
 export const getEntities = cache(async () => {

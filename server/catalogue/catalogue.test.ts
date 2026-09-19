@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { FEATURED_CATALOGUE } from './featured'
 import { deduplicateProducts, normalizeIdentifier, normalizeSearchTerm, rankCatalogueProduct } from './normalization'
+import { previewManualProduct } from './manual-preview'
 
 describe('catalogue identity', () => {
   it('normalises headphone model variants to the same identifier', () => {
@@ -21,5 +22,16 @@ describe('catalogue identity', () => {
     const duplicate = { ...sony, identifiers: { gtin: ['123456789'] } }
     const duplicateWithSameIdentifier = { ...sony, displayName: 'Sony XM6 listing', identifiers: { gtin: ['123456789'] } }
     expect(deduplicateProducts([duplicate, duplicateWithSameIdentifier])).toHaveLength(1)
+  })
+})
+
+describe('manual catalogue preview', () => {
+  it('does not claim that a shared catalogue resource was created', () => {
+    const product = FEATURED_CATALOGUE[0]
+    expect(previewManualProduct(product)).toMatchObject({
+      product,
+      persisted: false,
+      mode: 'manual_preview',
+    })
   })
 })

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider, type Theme } from "@/lib/theme";
-import { createClient } from "@/lib/supabase/server";
+import { ThemeProvider } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: {
@@ -28,20 +27,13 @@ const designContract = `<!--
   FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 -->`;
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const supabase = await createClient();
-  const { data: claims } = await supabase.auth.getClaims();
-  let defaultTheme: Theme = "system";
-  if (typeof claims?.claims?.sub === "string") {
-    const { data: preferences } = await supabase.from("user_preferences").select("theme").eq("user_id", claims.claims.sub).maybeSingle();
-    if (preferences?.theme === "light" || preferences?.theme === "dark" || preferences?.theme === "system") defaultTheme = preferences.theme;
-  }
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-AU" suppressHydrationWarning>
       <body>
         <div aria-hidden="true" hidden dangerouslySetInnerHTML={{ __html: designContract }} />
         <a href="#main-content" className="skip-link">Skip to main content</a>
-        <ThemeProvider defaultTheme={defaultTheme}>{children}</ThemeProvider>
+        <ThemeProvider defaultTheme="system">{children}</ThemeProvider>
       </body>
     </html>
   );

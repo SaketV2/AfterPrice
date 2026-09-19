@@ -1,10 +1,11 @@
 import 'server-only'
 import { getBillingAdminClient } from '@/lib/billing/supabase'
 import { getAuthenticatedContext } from '@/lib/supabase/server'
+import { BillingPersistenceError } from '@/lib/billing/errors'
+import { isEntitledBillingSubscription } from '@/lib/billing/entitlement'
 import type { BillingSubscriptionRow } from './types'
 
-const ENTITLED_STATUSES = new Set(['active', 'trialing'])
-const ENTITLED_PAYMENT_STATES = new Set(['paid', 'no_payment_required'])
+type BillingAdminClient = ReturnType<typeof getBillingAdminClient>
 
 export type BillingEntitlement = {
   entitled: boolean
@@ -15,6 +16,24 @@ export type BillingEntitlement = {
   currentPeriodEnd: string | null
 }
 
+export class ProRequiredError extends Error {
+  readonly code = 'PRO_REQUIRED'
+
+  constructor() {
+    super('Pro entitlement required.')
+    this.name = 'ProRequiredError'
+  }
+}
+
+export class BillingEntitlementLookupError extends BillingPersistenceError {
+  readonly code = 'BILLING_ENTITLEMENT_LOOKUP_FAILED'
+
+  constructor(cause: unknown) {
+    super(cause instanceof Error ? cause.message : 'Billing entitlement lookup failed.')
+    this.name = 'BillingEntitlementLookupError'
+  }
+}
+
 export async function getUserBillingEntitlement(userId: string, now = new Date()): Promise<BillingEntitlement> {
   const db = getBillingAdminClient()
   const { data, error } = await db
@@ -23,13 +42,10 @@ export async function getUserBillingEntitlement(userId: string, now = new Date()
     .eq('user_id', userId)
     .order('updated_at', { ascending: false })
     .limit(20)
-  if (error) throw new Error(`Billing entitlement lookup failed: ${error.message}`)
+  if (error) throw new BillingEntitlementLookupError(error)
 
   const rows = (data ?? []) as BillingSubscriptionRow[]
-  const active = rows.find(row => {
-    if (!ENTITLED_STATUSES.has(row.status) || !ENTITLED_PAYMENT_STATES.has(row.payment_state)) return false
-    return !row.current_period_end || Date.parse(row.current_period_end) > now.getTime()
-  })
+  const active = rows.find(row => isEntitledBillingSubscription(row, now))
   const planKey = active?.plan_key === 'monthly' || active?.plan_key === 'yearly' ? active.plan_key : null
   return {
     entitled: Boolean(active && planKey),
@@ -48,4 +64,31 @@ export async function getCurrentUserBillingEntitlement(): Promise<BillingEntitle
 
 export async function hasBillingEntitlement(userId: string, now = new Date()): Promise<boolean> {
   return (await getUserBillingEntitlement(userId, now)).entitled
+}
+
+export async function requireProEntitlement(userId: string, now = new Date()): Promise<BillingEntitlement> {
+  const entitlement = await getUserBillingEntitlement(userId, now)
+  if (!entitlement.entitled) throw new ProRequiredError()
+  return entitlement
+}
+
+export async function getEntitledUserIds(
+  userIds: string[],
+  now = new Date(),
+  db: BillingAdminClient = getBillingAdminClient(),
+): Promise<Set<string>> {
+  const uniqueUserIds = [...new Set(userIds)]
+  if (!uniqueUserIds.length) return new Set()
+  const { data, error } = await db
+    .from('billing_subscriptions')
+    .select('*')
+    .in('user_id', uniqueUserIds)
+    .limit(uniqueUserIds.length * 20)
+  if (error) throw new BillingEntitlementLookupError(error)
+
+  const entitled = new Set<string>()
+  for (const row of (data ?? []) as BillingSubscriptionRow[]) {
+    if (isEntitledBillingSubscription(row, now)) entitled.add(row.user_id)
+  }
+  return entitled
 }

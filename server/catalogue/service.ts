@@ -75,11 +75,12 @@ export async function searchCatalogue(
       .map(product => normalizeCatalogueProduct(product))
       .filter((product): product is NormalizedCatalogueProduct => Boolean(product))
   } catch (error) {
+    console.error(`[catalogue.search:${options.requestId ?? 'untracked'}] Provider request failed.`, error)
     return {
       products: localWithFeatured.slice(0, limit),
       source: localWithFeatured.length ? 'local' : 'featured',
       externalLookupAttempted: true,
-      externalLookupSkippedReason: error instanceof Error ? error.message : 'Catalogue provider request failed.',
+      externalLookupSkippedReason: 'The live catalogue source is temporarily unavailable.',
       cache: { attempted: false, persisted: 0, reason: 'Provider request failed before a cache write.' },
     }
   }
@@ -93,7 +94,8 @@ export async function searchCatalogue(
       persisted = persistedProducts.filter(product => Boolean(product.catalogProductId)).length
       persistenceReason = persisted ? 'Successful discoveries were cached in the shared Supabase catalogue.' : 'The provider returned products that could not be cached.'
     } catch (error) {
-      persistenceReason = error instanceof Error ? `Catalogue cache write failed: ${error.message}` : 'Catalogue cache write failed.'
+      console.error(`[catalogue.search:${options.requestId ?? 'untracked'}] Catalogue cache write failed.`, error)
+      persistenceReason = 'Catalogue results could not be cached.'
     }
   } else if (!writer) {
     persistenceReason = 'No server-only Supabase catalogue writer is configured.'

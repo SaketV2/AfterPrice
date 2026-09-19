@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = "https://afterprice.vercel.app";
+import { getPublicSiteOrigin } from "@/lib/http/site-origin";
 
 export default function robots(): MetadataRoute.Robots {
+  const siteUrl = getPublicSiteOrigin();
   return {
     rules: {
       userAgent: "*",

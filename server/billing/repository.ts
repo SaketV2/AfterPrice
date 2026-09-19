@@ -1,4 +1,5 @@
 import { BillingPersistenceError } from '@/lib/billing/errors'
+import type { Database } from '@/lib/supabase/database.types'
 import type { BillingDb } from '@/lib/billing/supabase'
 import type { BillingCustomerRow, BillingSubscriptionRow, PendingCheckoutRow, SubscriptionSnapshot } from './types'
 
@@ -74,6 +75,17 @@ export async function markPendingCheckoutExpired(db: BillingDb, pendingId: strin
   if (error) throw persistenceError('Pending checkout expiry', error)
 }
 
+export async function expireStalePendingCheckouts(db: BillingDb): Promise<number> {
+  const { data, error } = await db
+    .from('pending_checkouts')
+    .update({ status: 'expired', updated_at: new Date().toISOString() })
+    .eq('status', 'pending')
+    .lte('expires_at', new Date().toISOString())
+    .select('id')
+  if (error) throw persistenceError('Pending checkout cleanup', error)
+  return data?.length ?? 0
+}
+
 export async function findPendingCheckoutById(db: BillingDb, id: string): Promise<PendingCheckoutRow | null> {
   const { data, error } = await db.from('pending_checkouts').select('*').eq('id', id).maybeSingle()
   if (error) throw persistenceError('Pending checkout lookup', error)
@@ -108,7 +120,7 @@ type PendingStripeUpdate = {
 }
 
 export async function updatePendingCheckoutFromStripe(db: BillingDb, pendingId: string, update: PendingStripeUpdate): Promise<PendingCheckoutRow | null> {
-  const values: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  const values: Database['public']['Tables']['pending_checkouts']['Update'] = { updated_at: new Date().toISOString() }
   if (update.checkoutSessionId !== undefined) values.checkout_session_id = update.checkoutSessionId
   if (update.stripeCustomerId !== undefined) values.stripe_customer_id = update.stripeCustomerId
   if (update.stripeSubscriptionId !== undefined) values.stripe_subscription_id = update.stripeSubscriptionId
